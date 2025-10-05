@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🕉️ Rig Veda Mood Explorer</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+Devanagari:wght@400;600&display=swap" rel="stylesheet">
@@ -25,7 +24,6 @@
             height: 100vh;
         }
 
-        /* Header Styles */
         #header {
             position: fixed;
             top: 0;
@@ -113,9 +111,9 @@
         .autocomplete-count {
             color: rgba(255, 255, 255, 0.6);
             font-size: 0.875rem;
+            margin-left: 0.5rem;
         }
 
-        /* Visualization Area */
         #viz-container {
             position: fixed;
             top: 140px;
@@ -129,7 +127,6 @@
             cursor: grabbing;
         }
 
-        /* Network Controls */
         #network-controls {
             position: fixed;
             top: 160px;
@@ -165,7 +162,6 @@
             transform: scale(1.05);
         }
 
-        /* Legend */
         #legend {
             position: fixed;
             bottom: 2rem;
@@ -207,7 +203,6 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
-        /* Modal */
         #modal-backdrop {
             position: fixed;
             top: 0;
@@ -320,6 +315,7 @@
             display: flex;
             gap: 1rem;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         .nav-btn {
@@ -344,7 +340,6 @@
             cursor: not-allowed;
         }
 
-        /* Tooltip */
         #tooltip {
             position: absolute;
             background: rgba(10, 14, 39, 0.95);
@@ -359,7 +354,6 @@
             white-space: nowrap;
         }
 
-        /* Loading Indicator */
         #loading {
             position: fixed;
             top: 0;
@@ -390,7 +384,6 @@
             color: #D4AF37;
         }
 
-        /* Error State */
         #error {
             position: fixed;
             top: 0;
@@ -430,7 +423,6 @@
             transform: scale(1.05);
         }
 
-        /* D3 Specific Styles */
         .node {
             cursor: pointer;
             transition: all 0.3s ease;
@@ -460,7 +452,6 @@
             font-weight: 500;
         }
 
-        /* Pulse Animation */
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.5); opacity: 0.5; }
@@ -470,7 +461,6 @@
             animation: pulse 0.6s ease-in-out 3;
         }
 
-        /* Mobile Styles */
         @media (max-width: 768px) {
             #title {
                 font-size: 1.25rem;
@@ -524,7 +514,6 @@
             }
         }
 
-        /* Scrollbar Styles */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -544,19 +533,16 @@
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
     <div id="loading">
         <div id="loading-spinner">🕉️</div>
         <div id="loading-text">Loading Rig Veda...</div>
     </div>
 
-    <!-- Error Screen -->
     <div id="error">
         <div id="error-message">Unable to load data. Please refresh.</div>
         <button id="retry-btn">Retry</button>
     </div>
 
-    <!-- Header -->
     <div id="header">
         <h1 id="title">🕉️ Rig Veda Mood Explorer</h1>
         <div id="search-container">
@@ -565,19 +551,16 @@
         </div>
     </div>
 
-    <!-- Visualization Container -->
     <div id="viz-container">
         <svg id="network-svg"></svg>
     </div>
 
-    <!-- Network Controls -->
     <div id="network-controls">
         <button class="control-btn" id="zoom-in">+</button>
         <button class="control-btn" id="zoom-out">−</button>
         <button class="control-btn" id="reset-view">↺</button>
     </div>
 
-    <!-- Legend -->
     <div id="legend">
         <div class="legend-title">Legend</div>
         <div class="legend-item">
@@ -598,7 +581,6 @@
         </div>
     </div>
 
-    <!-- Modal -->
     <div id="modal-backdrop">
         <div id="modal">
             <div id="modal-close">×</div>
@@ -615,11 +597,9 @@
         </div>
     </div>
 
-    <!-- Tooltip -->
     <div id="tooltip"></div>
 
     <script>
-        // Global State
         let data = [];
         let nodes = [];
         let links = [];
@@ -629,31 +609,32 @@
         let selectedNode = null;
         let currentVerseIndex = -1;
 
-        // Initialize Application
         async function init() {
             try {
-                // Load data
                 const response = await fetch('./rigveda_data_augmented.json');
                 if (!response.ok) throw new Error('Failed to load data');
-                data = await response.json();
+                
+                const text = await response.text();
+                data = JSON.parse(text);
 
-                // Sort data by mandala, sukta, verse
+                // Ensure data is an array
+                if (!Array.isArray(data)) {
+                    throw new Error('Data must be an array');
+                }
+
                 data.sort((a, b) => {
                     if (a.mandala !== b.mandala) return a.mandala - b.mandala;
                     if (a.sukta !== b.sukta) return a.sukta - b.sukta;
                     return a.verse - b.verse;
                 });
 
-                // Process data and create graph
                 createGraph();
                 buildSearchIndex();
                 setupEventListeners();
                 initializeVisualization();
 
-                // Hide loading screen
                 document.getElementById('loading').style.display = 'none';
 
-                // Setup mobile drift animation if applicable
                 if (window.innerWidth < 768) {
                     setupMobileDrift();
                 }
@@ -661,19 +642,17 @@
                 console.error('Error loading data:', error);
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('error').style.display = 'flex';
+                document.getElementById('error-message').textContent = 
+                    `Unable to load data: ${error.message}`;
             }
         }
 
-        // Create graph data structure from Rigveda data
         function createGraph() {
             const deityMap = new Map();
             const moodMap = new Map();
             const tagMap = new Map();
-            const nodeMap = new Map();
 
-            // Process each verse
             data.forEach((verse, index) => {
-                // Create verse node
                 const verseNode = {
                     id: `verse-${index}`,
                     type: 'verse',
@@ -681,9 +660,7 @@
                     data: verse
                 };
                 nodes.push(verseNode);
-                nodeMap.set(verseNode.id, verseNode);
 
-                // Process deity
                 if (verse.deity) {
                     if (!deityMap.has(verse.deity)) {
                         const deityNode = {
@@ -694,7 +671,6 @@
                         };
                         deityMap.set(verse.deity, deityNode);
                         nodes.push(deityNode);
-                        nodeMap.set(deityNode.id, deityNode);
                     }
                     deityMap.get(verse.deity).count++;
                     links.push({
@@ -703,7 +679,6 @@
                     });
                 }
 
-                // Process mood
                 if (verse.mood) {
                     if (!moodMap.has(verse.mood)) {
                         const moodNode = {
@@ -714,7 +689,6 @@
                         };
                         moodMap.set(verse.mood, moodNode);
                         nodes.push(moodNode);
-                        nodeMap.set(moodNode.id, moodNode);
                     }
                     moodMap.get(verse.mood).count++;
                     links.push({
@@ -723,8 +697,7 @@
                     });
                 }
 
-                // Process tags
-                if (verse.tags && verse.tags.length > 0) {
+                if (verse.tags && Array.isArray(verse.tags) && verse.tags.length > 0) {
                     verse.tags.forEach(tag => {
                         if (!tagMap.has(tag)) {
                             const tagNode = {
@@ -735,7 +708,6 @@
                             };
                             tagMap.set(tag, tagNode);
                             nodes.push(tagNode);
-                            nodeMap.set(tagNode.id, tagNode);
                         }
                         tagMap.get(tag).count++;
                         links.push({
@@ -747,10 +719,8 @@
             });
         }
 
-        // Build search index
         function buildSearchIndex() {
             const indexSet = new Set();
-
             nodes.forEach(node => {
                 if (node.type !== 'verse') {
                     indexSet.add(JSON.stringify({
@@ -761,22 +731,18 @@
                     }));
                 }
             });
-
             searchIndex = Array.from(indexSet).map(item => JSON.parse(item));
         }
 
-        // Initialize D3 visualization
         function initializeVisualization() {
             const container = document.getElementById('viz-container');
             const width = container.clientWidth;
             const height = container.clientHeight;
 
-            // Create SVG
             svg = d3.select('#network-svg')
                 .attr('width', width)
                 .attr('height', height);
 
-            // Create zoom behavior
             zoom = d3.zoom()
                 .scaleExtent([0.1, 10])
                 .on('zoom', (event) => {
@@ -784,22 +750,14 @@
                 });
 
             svg.call(zoom);
-
-            // Create main group
             g = svg.append('g');
 
-            // Create force simulation
             simulation = d3.forceSimulation(nodes)
                 .force('link', d3.forceLink(links)
                     .id(d => d.id)
-                    .distance(d => {
-                        // Shorter distances for verse connections
-                        if (d.target.type === 'verse') return 30;
-                        return 100;
-                    }))
+                    .distance(d => d.target.type === 'verse' ? 30 : 100))
                 .force('charge', d3.forceManyBody()
                     .strength(d => {
-                        // Different strengths based on node type
                         if (d.type === 'verse') return -10;
                         if (d.type === 'deity') return -200;
                         if (d.type === 'mood') return -150;
@@ -813,14 +771,12 @@
                     return 15;
                 }));
 
-            // Create links
             link = g.append('g')
                 .selectAll('line')
                 .data(links)
                 .join('line')
                 .attr('class', 'link');
 
-            // Create nodes
             node = g.append('g')
                 .selectAll('circle')
                 .data(nodes)
@@ -848,7 +804,6 @@
                     .on('drag', dragged)
                     .on('end', dragEnded));
 
-            // Create labels for non-verse nodes
             label = g.append('g')
                 .selectAll('text')
                 .data(nodes.filter(d => d.type !== 'verse'))
@@ -861,7 +816,6 @@
                 })
                 .text(d => d.label);
 
-            // Create gradients
             const defs = svg.append('defs');
 
             const deityGradient = defs.append('linearGradient')
@@ -885,7 +839,6 @@
             tagGradient.append('stop').attr('offset', '0%').attr('stop-color', '#6bcfff');
             tagGradient.append('stop').attr('offset', '100%').attr('stop-color', '#4da8da');
 
-            // Update positions on simulation tick
             simulation.on('tick', () => {
                 link
                     .attr('x1', d => d.source.x)
@@ -903,9 +856,7 @@
             });
         }
 
-        // Node hover handler
         function handleNodeHover(event, d) {
-            // Scale up node
             d3.select(this)
                 .transition()
                 .duration(200)
@@ -916,7 +867,6 @@
                     return 10;
                 });
 
-            // Show tooltip
             const tooltip = document.getElementById('tooltip');
             if (d.type !== 'verse') {
                 tooltip.innerHTML = `<strong>${d.label}</strong><br>${d.count} verses`;
@@ -926,9 +876,7 @@
             }
         }
 
-        // Node leave handler
         function handleNodeLeave(event, d) {
-            // Scale down node
             d3.select(this)
                 .transition()
                 .duration(200)
@@ -939,19 +887,15 @@
                     return 8;
                 });
 
-            // Hide tooltip
             document.getElementById('tooltip').style.display = 'none';
         }
 
-        // Node click handler
         function handleNodeClick(event, d) {
             event.stopPropagation();
 
             if (d.type === 'verse') {
-                // Open modal for verse
                 openVerseModal(d.verseIndex);
             } else {
-                // Toggle selection
                 if (selectedNode === d.id) {
                     resetNetworkView();
                 } else {
@@ -960,16 +904,13 @@
             }
         }
 
-        // Select a node and highlight its connections
         function selectNode(d) {
             selectedNode = d.id;
 
-            // Pulse animation
             const selectedCircle = node.filter(n => n.id === d.id);
             selectedCircle.classed('pulse', true);
             setTimeout(() => selectedCircle.classed('pulse', false), 1800);
 
-            // Get connected node IDs
             const connectedIds = new Set();
             connectedIds.add(d.id);
             
@@ -982,7 +923,6 @@
                 }
             });
 
-            // Fade unconnected nodes
             node.transition()
                 .duration(300)
                 .style('opacity', n => connectedIds.has(n.id) ? 1 : 0.1);
@@ -991,7 +931,6 @@
                 .duration(300)
                 .style('opacity', n => connectedIds.has(n.id) ? 1 : 0.1);
 
-            // Highlight connected links
             link.classed('active', false)
                 .transition()
                 .duration(300)
@@ -999,13 +938,19 @@
                     const sourceId = typeof l.source === 'object' ? l.source.id : l.source;
                     const targetId = typeof l.target === 'object' ? l.target.id : l.target;
                     if (sourceId === d.id || targetId === d.id) {
-                        d3.select(l).classed('active', true);
                         return 1;
                     }
                     return 0.02;
                 });
 
-            // Zoom to selected node
+            link.each(function(l) {
+                const sourceId = typeof l.source === 'object' ? l.source.id : l.source;
+                const targetId = typeof l.target === 'object' ? l.target.id : l.target;
+                if (sourceId === d.id || targetId === d.id) {
+                    d3.select(this).classed('active', true);
+                }
+            });
+
             const bbox = {
                 x: d.x - 200,
                 y: d.y - 200,
@@ -1015,7 +960,6 @@
             zoomToBbox(bbox);
         }
 
-        // Reset network view
         function resetNetworkView() {
             selectedNode = null;
 
@@ -1033,7 +977,6 @@
                 .style('opacity', 1);
         }
 
-        // Zoom to bounding box
         function zoomToBbox(bbox) {
             const container = document.getElementById('viz-container');
             const width = container.clientWidth;
@@ -1051,7 +994,6 @@
                 .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
         }
 
-        // Drag handlers
         function dragStarted(event, d) {
             if (!event.active) simulation.alphaTarget(0.3).restart();
             d.fx = d.x;
@@ -1069,16 +1011,13 @@
             d.fy = null;
         }
 
-        // Open verse modal
         function openVerseModal(verseIndex) {
             currentVerseIndex = verseIndex;
             const verse = data[verseIndex];
 
-            // Set header
             document.getElementById('modal-header').textContent = 
                 `Mandala ${verse.mandala} • Sukta ${verse.sukta} • Verse ${verse.verse}`;
 
-            // Set tags
             const tagsContainer = document.getElementById('modal-tags');
             tagsContainer.innerHTML = '';
 
@@ -1100,7 +1039,7 @@
                 tagsContainer.appendChild(pill);
             }
 
-            if (verse.tags && verse.tags.length > 0) {
+            if (verse.tags && Array.isArray(verse.tags) && verse.tags.length > 0) {
                 verse.tags.forEach(tag => {
                     const pill = document.createElement('div');
                     pill.className = 'tag-pill';
@@ -1111,26 +1050,25 @@
                 });
             }
 
-            // Set text content
-            document.getElementById('modal-devanagari').textContent = verse.devanagari || '';
-            document.getElementById('modal-transliteration').textContent = verse.transliteration || '';
+            const devanagariText = verse.devanagari || '';
+            document.getElementById('modal-devanagari').textContent = devanagariText;
+            
+            const transliterationText = (verse.transliteration || '').replace(/<BR>/gi, ' ');
+            document.getElementById('modal-transliteration').textContent = transliterationText;
+            
             document.getElementById('modal-translation').textContent = verse.translation_griffith || '';
 
-            // Update navigation buttons
             document.getElementById('prev-btn').disabled = verseIndex === 0;
             document.getElementById('next-btn').disabled = verseIndex === data.length - 1;
 
-            // Show modal
             document.getElementById('modal-backdrop').style.display = 'flex';
         }
 
-        // Close verse modal
         function closeVerseModal() {
             document.getElementById('modal-backdrop').style.display = 'none';
             currentVerseIndex = -1;
         }
 
-        // Handle tag click in modal
         function handleTagClick(nodeId) {
             closeVerseModal();
             const targetNode = nodes.find(n => n.id === nodeId);
@@ -1139,29 +1077,24 @@
             }
         }
 
-        // Navigate to previous verse
         function navigateToPrevious() {
             if (currentVerseIndex > 0) {
                 openVerseModal(currentVerseIndex - 1);
             }
         }
 
-        // Navigate to next verse
         function navigateToNext() {
             if (currentVerseIndex < data.length - 1) {
                 openVerseModal(currentVerseIndex + 1);
             }
         }
 
-        // Navigate to random verse
         function navigateToRandom() {
             const randomIndex = Math.floor(Math.random() * data.length);
             openVerseModal(randomIndex);
         }
 
-        // Setup event listeners
         function setupEventListeners() {
-            // Search input
             const searchInput = document.getElementById('search-input');
             const autocompleteDropdown = document.getElementById('autocomplete-dropdown');
 
@@ -1173,7 +1106,6 @@
                     return;
                 }
 
-                // Filter search index
                 const results = searchIndex
                     .filter(item => item.label.toLowerCase().includes(query))
                     .slice(0, 8);
@@ -1183,7 +1115,6 @@
                     return;
                 }
 
-                // Populate dropdown
                 autocompleteDropdown.innerHTML = results.map(item => {
                     const emoji = item.type === 'deity' ? '🔥' : 
                                  item.type === 'mood' ? '🌙' : '🏷️';
@@ -1197,7 +1128,6 @@
 
                 autocompleteDropdown.style.display = 'block';
 
-                // Add click handlers
                 autocompleteDropdown.querySelectorAll('.autocomplete-item').forEach(item => {
                     item.addEventListener('click', () => {
                         const nodeId = item.dataset.nodeId;
@@ -1211,14 +1141,12 @@
                 });
             });
 
-            // Close dropdown when clicking outside
             document.addEventListener('click', (e) => {
                 if (!searchInput.contains(e.target) && !autocompleteDropdown.contains(e.target)) {
                     autocompleteDropdown.style.display = 'none';
                 }
             });
 
-            // Network controls
             document.getElementById('zoom-in').addEventListener('click', () => {
                 svg.transition().duration(300).call(zoom.scaleBy, 1.3);
             });
@@ -1238,7 +1166,6 @@
                 );
             });
 
-            // Modal controls
             document.getElementById('modal-close').addEventListener('click', closeVerseModal);
             document.getElementById('modal-backdrop').addEventListener('click', (e) => {
                 if (e.target.id === 'modal-backdrop') closeVerseModal();
@@ -1247,7 +1174,6 @@
             document.getElementById('next-btn').addEventListener('click', navigateToNext);
             document.getElementById('random-btn').addEventListener('click', navigateToRandom);
 
-            // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
                 if (currentVerseIndex !== -1) {
                     if (e.key === 'Escape') {
@@ -1263,21 +1189,18 @@
                 }
             });
 
-            // Background click to reset
             svg.on('click', (event) => {
                 if (event.target === svg.node()) {
                     resetNetworkView();
                 }
             });
 
-            // Retry button
             document.getElementById('retry-btn').addEventListener('click', () => {
                 document.getElementById('error').style.display = 'none';
                 document.getElementById('loading').style.display = 'flex';
-                init();
+                location.reload();
             });
 
-            // Window resize
             window.addEventListener('resize', () => {
                 const container = document.getElementById('viz-container');
                 const width = container.clientWidth;
@@ -1289,7 +1212,6 @@
             });
         }
 
-        // Setup mobile drift animation
         function setupMobileDrift() {
             let driftInterval;
             let isPaused = false;
@@ -1297,11 +1219,6 @@
             function startDrift() {
                 driftInterval = setInterval(() => {
                     if (!isPaused && !selectedNode) {
-                        const container = document.getElementById('viz-container');
-                        const width = container.clientWidth;
-                        const height = container.clientHeight;
-                        
-                        // Apply a gentle random drift
                         const currentTransform = d3.zoomTransform(svg.node());
                         const dx = (Math.random() - 0.5) * 20;
                         const dy = (Math.random() - 0.5) * 20;
@@ -1318,7 +1235,6 @@
                 }, 2000);
             }
 
-            // Pause on touch
             svg.on('touchstart', () => {
                 isPaused = true;
             });
@@ -1332,7 +1248,6 @@
             startDrift();
         }
 
-        // Start the application
         init();
     </script>
 </body>
