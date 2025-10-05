@@ -404,6 +404,38 @@
             color: #D4AF37;
             margin-bottom: 2rem;
             text-align: center;
+            max-width: 800px;
+        }
+
+        #error-instructions {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            text-align: left;
+        }
+
+        #error-instructions h3 {
+            color: #D4AF37;
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+        }
+
+        #error-instructions pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 0.5rem 0;
+            color: #6bcfff;
+            font-family: 'Courier New', monospace;
+        }
+
+        #error-instructions p {
+            margin: 0.5rem 0;
+            line-height: 1.6;
         }
 
         #retry-btn {
@@ -445,11 +477,12 @@
         }
 
         .node-label {
-            font-size: 11px;
-            fill: rgba(255, 255, 255, 0.9);
+            font-size: 12px;
+            fill: rgba(255, 255, 255, 0.95);
             pointer-events: none;
             text-anchor: middle;
-            font-weight: 500;
+            font-weight: 600;
+            text-shadow: 0 0 4px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 0, 0, 0.6);
         }
 
         @keyframes pulse {
@@ -539,7 +572,21 @@
     </div>
 
     <div id="error">
-        <div id="error-message">Unable to load data. Please refresh.</div>
+        <div id="error-message">Unable to load data.</div>
+        <div id="error-instructions">
+            <h3>📋 How to run this app:</h3>
+            <p><strong>Option 1: Python (if installed)</strong></p>
+            <pre>python -m http.server 8000</pre>
+            <p>Then open: <strong>http://localhost:8000</strong></p>
+            
+            <p><strong>Option 2: VS Code Live Server extension</strong></p>
+            <p>1. Install "Live Server" extension<br>
+            2. Right-click index.html → "Open with Live Server"</p>
+            
+            <p><strong>Option 3: Node.js (if installed)</strong></p>
+            <pre>npx http-server -p 8000</pre>
+            <p>Then open: <strong>http://localhost:8000</strong></p>
+        </div>
         <button id="retry-btn">Retry</button>
     </div>
 
@@ -611,11 +658,29 @@
 
         async function init() {
             try {
+                // Check if D3.js is loaded
+                if (typeof d3 === 'undefined') {
+                    throw new Error('D3.js failed to load. Please check your internet connection.');
+                }
+
+                // Check if running on file:// protocol
+                if (window.location.protocol === 'file:') {
+                    throw new Error('Please run this app through a local server. Cannot load JSON via file:// protocol due to CORS restrictions.');
+                }
+
                 const response = await fetch('./rigveda_data_augmented.json');
-                if (!response.ok) throw new Error('Failed to load data');
+                if (!response.ok) {
+                    throw new Error(`Failed to load data: ${response.status} ${response.statusText}`);
+                }
                 
                 const text = await response.text();
-                data = JSON.parse(text);
+                
+                // Try to parse JSON
+                try {
+                    data = JSON.parse(text);
+                } catch (parseError) {
+                    throw new Error(`Invalid JSON format: ${parseError.message}`);
+                }
 
                 // Ensure data is an array
                 if (!Array.isArray(data)) {
@@ -628,16 +693,16 @@
                     return a.verse - b.verse;
                 });
 
+                console.log(`Loaded ${data.length} verses`);
+
                 createGraph();
+                console.log(`Created ${nodes.length} nodes and ${links.length} links`);
+                
                 buildSearchIndex();
                 setupEventListeners();
                 initializeVisualization();
 
                 document.getElementById('loading').style.display = 'none';
-
-                if (window.innerWidth < 768) {
-                    setupMobileDrift();
-                }
             } catch (error) {
                 console.error('Error loading data:', error);
                 document.getElementById('loading').style.display = 'none';
@@ -755,21 +820,27 @@
             simulation = d3.forceSimulation(nodes)
                 .force('link', d3.forceLink(links)
                     .id(d => d.id)
-                    .distance(d => d.target.type === 'verse' ? 30 : 100))
+                    .distance(d => {
+                        const target = typeof d.target === 'object' ? d.target : nodes.find(n => n.id === d.target);
+                        return target && target.type === 'verse' ? 50 : 150;
+                    })
+                    .strength(0.5))
                 .force('charge', d3.forceManyBody()
                     .strength(d => {
-                        if (d.type === 'verse') return -10;
-                        if (d.type === 'deity') return -200;
-                        if (d.type === 'mood') return -150;
-                        return -100;
+                        if (d.type === 'verse') return -30;
+                        if (d.type === 'deity') return -500;
+                        if (d.type === 'mood') return -400;
+                        return -300;
                     }))
                 .force('center', d3.forceCenter(width / 2, height / 2))
                 .force('collision', d3.forceCollide().radius(d => {
-                    if (d.type === 'verse') return 8;
-                    if (d.type === 'deity') return 20;
-                    if (d.type === 'mood') return 18;
-                    return 15;
-                }));
+                    if (d.type === 'verse') return 10;
+                    if (d.type === 'deity') return 25;
+                    if (d.type === 'mood') return 22;
+                    return 18;
+                }))
+                .velocityDecay(0.6)
+                .alphaDecay(0.02);
 
             link = g.append('g')
                 .selectAll('line')
@@ -810,11 +881,16 @@
                 .join('text')
                 .attr('class', 'node-label')
                 .attr('dy', d => {
-                    if (d.type === 'deity') return 20;
-                    if (d.type === 'mood') return 18;
-                    return 16;
+                    if (d.type === 'deity') return -16;
+                    if (d.type === 'mood') return -14;
+                    return -12;
                 })
-                .text(d => d.label);
+                .text(d => d.label)
+                .style('font-size', d => {
+                    if (d.type === 'deity') return '13px';
+                    if (d.type === 'mood') return '12px';
+                    return '11px';
+                });
 
             const defs = svg.append('defs');
 
@@ -1189,11 +1265,13 @@
                 }
             });
 
-            svg.on('click', (event) => {
-                if (event.target === svg.node()) {
-                    resetNetworkView();
-                }
-            });
+            if (svg && svg.on) {
+                svg.on('click', (event) => {
+                    if (event.target === svg.node()) {
+                        resetNetworkView();
+                    }
+                });
+            }
 
             document.getElementById('retry-btn').addEventListener('click', () => {
                 document.getElementById('error').style.display = 'none';
@@ -1212,43 +1290,14 @@
             });
         }
 
-        function setupMobileDrift() {
-            let driftInterval;
-            let isPaused = false;
-
-            function startDrift() {
-                driftInterval = setInterval(() => {
-                    if (!isPaused && !selectedNode) {
-                        const currentTransform = d3.zoomTransform(svg.node());
-                        const dx = (Math.random() - 0.5) * 20;
-                        const dy = (Math.random() - 0.5) * 20;
-                        
-                        svg.transition()
-                            .duration(2000)
-                            .ease(d3.easeLinear)
-                            .call(zoom.transform, 
-                                d3.zoomIdentity
-                                    .translate(currentTransform.x + dx, currentTransform.y + dy)
-                                    .scale(currentTransform.k)
-                            );
-                    }
-                }, 2000);
-            }
-
-            svg.on('touchstart', () => {
-                isPaused = true;
+        // Wait for D3 to load before initializing
+        if (typeof d3 === 'undefined') {
+            window.addEventListener('load', () => {
+                setTimeout(init, 100);
             });
-
-            svg.on('touchend', () => {
-                setTimeout(() => {
-                    isPaused = false;
-                }, 3000);
-            });
-
-            startDrift();
+        } else {
+            init();
         }
-
-        init();
     </script>
 </body>
 </html>
