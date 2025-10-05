@@ -3,26 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🕉️ Rig Veda Mood Explorer</title>
+    <title>Veda One</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+Devanagari:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
+        :root {
+            --gold: #D4AF37;
+            --dark-blue: #0A0E27;
+            --light-blue: #1a1f3a;
+            --text-light: rgba(255, 255, 255, 0.8);
+            --border-color: rgba(212, 175, 55, 0.2);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            font-size: 16px;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0A0E27 0%, #1a1f3a 100%);
+            background: var(--dark-blue);
             color: #fff;
             overflow: hidden;
             height: 100vh;
+            width: 100vw;
+            position: relative;
         }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         #header {
             position: fixed;
@@ -30,93 +47,75 @@
             left: 0;
             right: 0;
             z-index: 100;
-            background: rgba(10, 14, 39, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-            padding: 1rem 2rem;
+            padding: 1.5rem;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+            pointer-events: none;
+        }
+        
+        #header::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        #header > * {
+            pointer-events: all;
         }
 
         #title {
-            font-size: 1.75rem;
+            font-size: clamp(1.5rem, 4vw, 2rem);
             font-weight: 700;
-            text-align: center;
-            margin-bottom: 1rem;
-            color: #D4AF37;
-            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            color: var(--gold);
+            text-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
+            margin-bottom: 0.5rem;
+            animation: fadeInUp 0.8s ease-out 0.2s;
+            animation-fill-mode: backwards;
         }
 
-        #search-container {
-            position: relative;
-            max-width: 600px;
-            margin: 0 auto;
+        #subtitle {
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            font-weight: 400;
+            color: var(--text-light);
+            max-width: 550px;
+            margin: 0 auto 1.5rem auto;
+            line-height: 1.6;
+            animation: fadeInUp 0.8s ease-out 0.4s;
+            animation-fill-mode: backwards;
         }
-
-        #search-input {
-            width: 100%;
-            padding: 0.75rem 1.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 25px;
-            color: #fff;
-            font-size: 1rem;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        #search-input:focus {
-            border-color: #D4AF37;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        #search-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        #autocomplete-dropdown {
-            position: absolute;
-            top: calc(100% + 0.5rem);
-            left: 0;
-            right: 0;
-            background: rgba(10, 14, 39, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 12px;
-            max-height: 300px;
-            overflow-y: auto;
-            display: none;
-            z-index: 1000;
-        }
-
-        .autocomplete-item {
-            padding: 0.75rem 1.5rem;
-            cursor: pointer;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.2s ease;
-        }
-
-        .autocomplete-item:hover {
-            background: rgba(212, 175, 55, 0.1);
-        }
-
-        .autocomplete-item:last-child {
-            border-bottom: none;
-        }
-
-        .autocomplete-label {
+        
+        #random-verse-btn {
+            background: rgba(212, 175, 55, 0.2);
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            color: var(--gold);
+            padding: 0.8rem 1.75rem;
+            border-radius: 50px;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
             font-weight: 600;
-            color: #D4AF37;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+            animation: fadeInUp 0.8s ease-out 0.6s;
+            animation-fill-mode: backwards;
+            backdrop-filter: blur(5px);
         }
 
-        .autocomplete-count {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.875rem;
-            margin-left: 0.5rem;
+        #random-verse-btn:hover {
+            background: rgba(212, 175, 55, 0.3);
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
         }
 
         #viz-container {
             position: fixed;
-            top: 140px;
+            top: 0;
             left: 0;
             right: 0;
             bottom: 0;
@@ -129,27 +128,24 @@
 
         #network-controls {
             position: fixed;
-            top: 160px;
+            bottom: 2rem;
             right: 2rem;
             z-index: 90;
-            background: rgba(10, 14, 39, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 12px;
-            padding: 0.5rem;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
 
         .control-btn {
-            width: 40px;
-            height: 40px;
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 8px;
-            color: #D4AF37;
-            font-size: 1.25rem;
+            width: 44px;
+            height: 44px;
+            background: rgba(10, 14, 39, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            color: var(--gold);
+            font-size: 1.5rem;
+            font-weight: 300;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
@@ -159,473 +155,102 @@
 
         .control-btn:hover {
             background: rgba(212, 175, 55, 0.2);
-            transform: scale(1.05);
+            transform: scale(1.1);
         }
 
-        #legend {
-            position: fixed;
-            bottom: 2rem;
-            left: 2rem;
-            z-index: 90;
-            background: rgba(10, 14, 39, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 12px;
-            padding: 1rem;
-            min-width: 200px;
-        }
-
-        .legend-title {
-            font-weight: 600;
-            color: #D4AF37;
-            margin-bottom: 0.75rem;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .legend-circle {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .legend-label {
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
+        /* Modal Styles */
         #modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
             z-index: 200;
             display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
+            align-items: center; justify-content: center;
+            padding: 1rem;
+            animation: fadeIn 0.3s ease;
         }
 
         #modal {
             background: linear-gradient(135deg, rgba(10, 14, 39, 0.95) 0%, rgba(26, 31, 58, 0.95) 100%);
             border: 2px solid rgba(212, 175, 55, 0.3);
             border-radius: 20px;
-            max-width: 800px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 2rem;
-            position: relative;
+            max-width: 800px; width: 100%; max-height: 90vh;
+            overflow-y: auto; padding: 2rem; position: relative;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
-
         #modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            width: 36px;
-            height: 36px;
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 50%;
-            color: #D4AF37;
-            font-size: 1.5rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: absolute; top: 1rem; right: 1rem; width: 36px; height: 36px;
+            background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 50%; color: var(--gold); font-size: 1.5rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
             transition: all 0.2s ease;
         }
-
-        #modal-close:hover {
-            background: rgba(212, 175, 55, 0.2);
-            transform: rotate(90deg);
-        }
-
-        #modal-header {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #D4AF37;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
-        #modal-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            justify-content: center;
-            margin-bottom: 2rem;
-        }
-
-        .tag-pill {
-            padding: 0.5rem 1rem;
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 20px;
-            font-size: 0.875rem;
-            color: #D4AF37;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .tag-pill:hover {
-            background: rgba(212, 175, 55, 0.2);
-            transform: translateY(-2px);
-        }
-
-        #modal-devanagari {
-            font-family: 'Noto Serif Devanagari', serif;
-            font-size: 1.75rem;
-            text-align: center;
-            margin-bottom: 1.5rem;
-            line-height: 1.8;
-            color: #fff;
-        }
-
-        #modal-transliteration {
-            font-style: italic;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 1.5rem;
-            font-size: 1.125rem;
-        }
-
-        #modal-translation {
-            text-align: center;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 2rem;
-            font-size: 1.125rem;
-        }
-
-        #modal-nav {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .nav-btn {
-            padding: 0.75rem 1.5rem;
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 12px;
-            color: #D4AF37;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 1rem;
-        }
-
-        .nav-btn:hover:not(:disabled) {
-            background: rgba(212, 175, 55, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .nav-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        #tooltip {
-            position: absolute;
-            background: rgba(10, 14, 39, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
+        #modal-close:hover { background: rgba(212, 175, 55, 0.2); transform: rotate(90deg); }
+        #modal-header { font-size: 1.25rem; font-weight: 600; color: var(--gold); margin-bottom: 1.5rem; text-align: center; }
+        #modal-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 2rem; }
+        .tag-pill { padding: 0.5rem 1rem; background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 20px; font-size: 0.875rem; color: var(--gold); }
+        #modal-devanagari { font-family: 'Noto Serif Devanagari', serif; font-size: 1.75rem; text-align: center; margin-bottom: 1.5rem; line-height: 1.8; color: #fff; }
+        #modal-transliteration { font-style: italic; text-align: center; color: var(--text-light); margin-bottom: 1.5rem; font-size: 1.125rem; }
+        #modal-translation { text-align: center; line-height: 1.8; color: rgba(255, 255, 255, 0.9); margin-bottom: 2rem; font-size: 1.125rem; }
+        #modal-nav { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .nav-btn { padding: 0.75rem 1.5rem; background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; color: var(--gold); font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; }
+        .nav-btn:hover:not(:disabled) { background: rgba(212, 175, 55, 0.2); transform: translateY(-2px); }
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        
+        /* SVG Element Styles */
+        .om-symbol {
+            font-size: 100px;
+            fill: var(--dark-blue);
+            text-anchor: middle;
+            dominant-baseline: central;
             pointer-events: none;
-            z-index: 1000;
-            display: none;
-            font-size: 0.875rem;
-            white-space: nowrap;
         }
-
-        #loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #0A0E27 0%, #1a1f3a 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 300;
-        }
-
-        #loading-spinner {
-            font-size: 4rem;
-            animation: spin 2s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        #loading-text {
-            margin-top: 1rem;
-            font-size: 1.25rem;
-            color: #D4AF37;
-        }
-
-        #error {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #0A0E27 0%, #1a1f3a 100%);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 300;
-            padding: 2rem;
-        }
-
-        #error-message {
-            font-size: 1.5rem;
-            color: #D4AF37;
-            margin-bottom: 2rem;
-            text-align: center;
-            max-width: 800px;
-        }
-
-        #error-instructions {
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            max-width: 600px;
-            text-align: left;
-        }
-
-        #error-instructions h3 {
-            color: #D4AF37;
-            margin-bottom: 1rem;
-            font-size: 1.125rem;
-        }
-
-        #error-instructions pre {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 1rem;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin: 0.5rem 0;
-            color: #6bcfff;
-            font-family: 'Courier New', monospace;
-        }
-
-        #error-instructions p {
-            margin: 0.5rem 0;
-            line-height: 1.6;
-        }
-
-        #retry-btn {
-            padding: 1rem 2rem;
-            background: rgba(212, 175, 55, 0.2);
-            border: 2px solid #D4AF37;
-            border-radius: 12px;
-            color: #D4AF37;
-            font-weight: 600;
+        .mandala-circle {
+            stroke: var(--gold);
+            stroke-width: 0.5px;
+            fill: white;
+            transition: transform 0.3s ease;
             cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.2s ease;
         }
-
-        #retry-btn:hover {
-            background: rgba(212, 175, 55, 0.3);
+        .mandala-group:hover .mandala-circle {
             transform: scale(1.05);
         }
-
-        .node {
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .verse-dot {
+            fill: var(--dark-blue);
+            cursor: pointer; /* ** CHANGE: Make dots clickable ** */
         }
 
-        .node:hover {
-            filter: drop-shadow(0 0 8px currentColor);
+        #loading, #error {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--dark-blue);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 300; padding: 2rem; text-align: center;
         }
-
-        .link {
-            stroke: rgba(255, 255, 255, 0.1);
-            stroke-width: 1px;
-            transition: all 0.3s ease;
-        }
-
-        .link.active {
-            stroke: #D4AF37;
-            stroke-width: 2px;
-            filter: drop-shadow(0 0 4px #D4AF37);
-        }
-
-        .node-label {
-            font-size: 12px;
-            fill: rgba(255, 255, 255, 0.95);
-            pointer-events: none;
-            text-anchor: middle;
-            font-weight: 600;
-            text-shadow: 0 0 4px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 0, 0, 0.6);
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-        }
-
-        .pulse {
-            animation: pulse 0.6s ease-in-out 3;
-        }
-
-        @media (max-width: 768px) {
-            #title {
-                font-size: 1.25rem;
-            }
-
-            #search-input {
-                font-size: 0.875rem;
-                padding: 0.625rem 1rem;
-            }
-
-            #legend {
-                bottom: 1rem;
-                left: 1rem;
-                padding: 0.75rem;
-                min-width: 150px;
-            }
-
-            .legend-title {
-                font-size: 0.75rem;
-            }
-
-            .legend-label {
-                font-size: 0.75rem;
-            }
-
-            #network-controls {
-                top: 140px;
-                right: 1rem;
-            }
-
-            #modal {
-                padding: 1.5rem;
-                border-radius: 16px;
-            }
-
-            #modal-devanagari {
-                font-size: 1.5rem;
-            }
-
-            #modal-transliteration {
-                font-size: 1rem;
-            }
-
-            #modal-translation {
-                font-size: 1rem;
-            }
-
-            .nav-btn {
-                padding: 0.625rem 1rem;
-                font-size: 0.875rem;
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(212, 175, 55, 0.3);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(212, 175, 55, 0.5);
-        }
+        #loading-spinner { font-size: 4rem; animation: spin 2s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        #loading-text { margin-top: 1rem; font-size: 1.25rem; color: var(--gold); }
+        #error-message { font-size: 1.5rem; color: var(--gold); max-width: 800px; }
     </style>
 </head>
 <body>
     <div id="loading">
         <div id="loading-spinner">🕉️</div>
-        <div id="loading-text">Loading Rig Veda...</div>
+        <div id="loading-text">Loading the cosmos...</div>
     </div>
-
-    <div id="error">
-        <div id="error-message">Unable to load data.</div>
-        <div id="error-instructions">
-            <h3>📋 How to run this app:</h3>
-            <p><strong>Option 1: Python (if installed)</strong></p>
-            <pre>python -m http.server 8000</pre>
-            <p>Then open: <strong>http://localhost:8000</strong></p>
-            
-            <p><strong>Option 2: VS Code Live Server extension</strong></p>
-            <p>1. Install "Live Server" extension<br>
-            2. Right-click index.html → "Open with Live Server"</p>
-            
-            <p><strong>Option 3: Node.js (if installed)</strong></p>
-            <pre>npx http-server -p 8000</pre>
-            <p>Then open: <strong>http://localhost:8000</strong></p>
-        </div>
-        <button id="retry-btn">Retry</button>
-    </div>
+    <div id="error" style="display: none;"><div id="error-message"></div></div>
 
     <div id="header">
-        <h1 id="title">🕉️ Rig Veda Mood Explorer</h1>
-        <div id="search-container">
-            <input type="text" id="search-input" placeholder="Search by deity, mood, or tag...">
-            <div id="autocomplete-dropdown"></div>
-        </div>
+        <h1 id="title">Veda One</h1>
+        <p id="subtitle">10,552 Verses from the 10 mandalas of the Rigveda. The sphere symbolizes the eternal nature of the Veda, with each dot being a verse.</p>
+        <button id="random-verse-btn">✨ See what the Veda has to say to you</button>
     </div>
 
-    <div id="viz-container">
-        <svg id="network-svg"></svg>
-    </div>
+    <div id="viz-container"><svg id="network-svg"></svg></div>
 
     <div id="network-controls">
-        <button class="control-btn" id="zoom-in">+</button>
-        <button class="control-btn" id="zoom-out">−</button>
-        <button class="control-btn" id="reset-view">↺</button>
-    </div>
-
-    <div id="legend">
-        <div class="legend-title">Legend</div>
-        <div class="legend-item">
-            <div class="legend-circle" style="background: linear-gradient(135deg, #ff6b6b, #ff8e53);"></div>
-            <div class="legend-label">Deities</div>
-        </div>
-        <div class="legend-item">
-            <div class="legend-circle" style="background: linear-gradient(135deg, #ffd93d, #f6c344);"></div>
-            <div class="legend-label">Moods</div>
-        </div>
-        <div class="legend-item">
-            <div class="legend-circle" style="background: linear-gradient(135deg, #6bcfff, #4da8da);"></div>
-            <div class="legend-label">Tags</div>
-        </div>
-        <div class="legend-item">
-            <div class="legend-circle" style="background: #fff; border: 2px solid #D4AF37;"></div>
-            <div class="legend-label">Verses</div>
-        </div>
+        <button class="control-btn" id="zoom-in" title="Zoom In">+</button>
+        <button class="control-btn" id="zoom-out" title="Zoom Out">−</button>
+        <button class="control-btn" id="reset-view" title="Reset View">↺</button>
     </div>
 
     <div id="modal-backdrop">
@@ -638,165 +263,71 @@
             <div id="modal-translation"></div>
             <div id="modal-nav">
                 <button class="nav-btn" id="prev-btn">← Previous</button>
-                <button class="nav-btn" id="random-btn">🎲 Random</button>
+                <button class="nav-btn" id="random-btn">🎲 New Verse</button>
                 <button class="nav-btn" id="next-btn">Next →</button>
             </div>
         </div>
     </div>
 
-    <div id="tooltip"></div>
-
     <script>
-        let data = [];
-        let nodes = [];
-        let links = [];
-        let simulation;
-        let svg, g, link, node, label, zoom;
-        let searchIndex = [];
-        let selectedNode = null;
+        let verses = [];
+        let mandalas = [];
+        let svg, g, zoom;
         let currentVerseIndex = -1;
+        let initialTransform;
 
         async function init() {
             try {
-                // Check if D3.js is loaded
-                if (typeof d3 === 'undefined') {
-                    throw new Error('D3.js failed to load. Please check your internet connection.');
-                }
-
-                // Check if running on file:// protocol
-                if (window.location.protocol === 'file:') {
-                    throw new Error('Please run this app through a local server. Cannot load JSON via file:// protocol due to CORS restrictions.');
-                }
-
+                if (typeof d3 === 'undefined') throw new Error('D3.js failed to load.');
                 const response = await fetch('./rigveda_data_augmented.json');
-                if (!response.ok) {
-                    throw new Error(`Failed to load data: ${response.status} ${response.statusText}`);
-                }
+                if (!response.ok) throw new Error(`Failed to load data: ${response.status}`);
                 
-                const text = await response.text();
+                const data = await response.json();
+                if (!Array.isArray(data)) throw new Error('Data must be an array');
+
+                verses = data.map((d, i) => ({...d, originalIndex: i}));
                 
-                // Try to parse JSON
-                try {
-                    data = JSON.parse(text);
-                } catch (parseError) {
-                    throw new Error(`Invalid JSON format: ${parseError.message}`);
-                }
+                const groupedByMandala = d3.group(verses, d => d.mandala);
+                mandalas = Array.from(groupedByMandala, ([mandalaNum, versesInMandala]) => ({
+                    mandalaNum,
+                    verses: versesInMandala
+                }));
 
-                // Ensure data is an array
-                if (!Array.isArray(data)) {
-                    throw new Error('Data must be an array');
-                }
-
-                data.sort((a, b) => {
-                    if (a.mandala !== b.mandala) return a.mandala - b.mandala;
-                    if (a.sukta !== b.sukta) return a.sukta - b.sukta;
-                    return a.verse - b.verse;
-                });
-
-                console.log(`Loaded ${data.length} verses`);
-
-                createGraph();
-                console.log(`Created ${nodes.length} nodes and ${links.length} links`);
-                
-                buildSearchIndex();
-                setupEventListeners();
+                calculatePositions();
                 initializeVisualization();
+                setupEventListeners();
 
                 document.getElementById('loading').style.display = 'none';
             } catch (error) {
-                console.error('Error loading data:', error);
+                console.error('Initialization Error:', error);
+                const errDiv = document.getElementById('error');
+                const errMsg = document.getElementById('error-message');
+                errMsg.textContent = `Error: ${error.message}. Please ensure the data file is present and you are running this on a server.`;
+                errDiv.style.display = 'flex';
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').style.display = 'flex';
-                document.getElementById('error-message').textContent = 
-                    `Unable to load data: ${error.message}`;
             }
         }
 
-        function createGraph() {
-            const deityMap = new Map();
-            const moodMap = new Map();
-            const tagMap = new Map();
+        function calculatePositions() {
+            const numMandalas = mandalas.length;
+            const mainRadius = 250; 
+            const mandalaRadius = 60; 
 
-            data.forEach((verse, index) => {
-                const verseNode = {
-                    id: `verse-${index}`,
-                    type: 'verse',
-                    verseIndex: index,
-                    data: verse
-                };
-                nodes.push(verseNode);
-
-                if (verse.deity) {
-                    if (!deityMap.has(verse.deity)) {
-                        const deityNode = {
-                            id: `deity-${verse.deity}`,
-                            type: 'deity',
-                            label: verse.deity,
-                            count: 0
-                        };
-                        deityMap.set(verse.deity, deityNode);
-                        nodes.push(deityNode);
-                    }
-                    deityMap.get(verse.deity).count++;
-                    links.push({
-                        source: `deity-${verse.deity}`,
-                        target: verseNode.id
-                    });
-                }
-
-                if (verse.mood) {
-                    if (!moodMap.has(verse.mood)) {
-                        const moodNode = {
-                            id: `mood-${verse.mood}`,
-                            type: 'mood',
-                            label: verse.mood,
-                            count: 0
-                        };
-                        moodMap.set(verse.mood, moodNode);
-                        nodes.push(moodNode);
-                    }
-                    moodMap.get(verse.mood).count++;
-                    links.push({
-                        source: `mood-${verse.mood}`,
-                        target: verseNode.id
-                    });
-                }
-
-                if (verse.tags && Array.isArray(verse.tags) && verse.tags.length > 0) {
-                    verse.tags.forEach(tag => {
-                        if (!tagMap.has(tag)) {
-                            const tagNode = {
-                                id: `tag-${tag}`,
-                                type: 'tag',
-                                label: tag,
-                                count: 0
-                            };
-                            tagMap.set(tag, tagNode);
-                            nodes.push(tagNode);
-                        }
-                        tagMap.get(tag).count++;
-                        links.push({
-                            source: `tag-${tag}`,
-                            target: verseNode.id
-                        });
-                    });
-                }
+            mandalas.forEach((mandala, i) => {
+                const angle = (i / numMandalas) * 2 * Math.PI;
+                mandala.x = mainRadius * Math.cos(angle);
+                mandala.y = mainRadius * Math.sin(angle);
+                
+                const numVerses = mandala.verses.length;
+                const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+                
+                mandala.verses.forEach((verse, j) => {
+                    const r = Math.sqrt(j / numVerses) * mandalaRadius * 0.95;
+                    const theta = j * goldenAngle;
+                    verse.x = r * Math.cos(theta);
+                    verse.y = r * Math.sin(theta);
+                });
             });
-        }
-
-        function buildSearchIndex() {
-            const indexSet = new Set();
-            nodes.forEach(node => {
-                if (node.type !== 'verse') {
-                    indexSet.add(JSON.stringify({
-                        type: node.type,
-                        label: node.label,
-                        id: node.id,
-                        count: node.count
-                    }));
-                }
-            });
-            searchIndex = Array.from(indexSet).map(item => JSON.parse(item));
         }
 
         function initializeVisualization() {
@@ -804,500 +335,164 @@
             const width = container.clientWidth;
             const height = container.clientHeight;
 
-            svg = d3.select('#network-svg')
-                .attr('width', width)
-                .attr('height', height);
+            svg = d3.select('#network-svg').attr('width', width).attr('height', height);
+            g = svg.append('g');
+            
+            g.append('circle')
+                .attr('r', 150)
+                .attr('fill', 'var(--gold)');
+            
+            g.append('text')
+                .attr('class', 'om-symbol')
+                .text('🕉️');
+
+            const mandalaGroups = g.selectAll('.mandala-group')
+                .data(mandalas)
+                .join('g')
+                .attr('class', 'mandala-group')
+                .attr('transform', d => `translate(${d.x}, ${d.y})`);
+
+            mandalaGroups.append('circle')
+                .attr('class', 'mandala-circle')
+                .attr('r', 60)
+                .on('click', (event, d) => {
+                    event.stopPropagation();
+                    zoomToMandala(d);
+                });
+
+            mandalaGroups.each(function(mandalaData) {
+                d3.select(this).selectAll('.verse-dot')
+                    .data(mandalaData.verses)
+                    .join('circle')
+                    .attr('class', 'verse-dot')
+                    .attr('cx', d => d.x)
+                    .attr('cy', d => d.y)
+                    .attr('r', 0.75)
+                    // ** CHANGE: Added click handler to each verse dot **
+                    .on('click', (event, d) => {
+                        event.stopPropagation(); // Prevent mandala-circle click
+                        openVerseModal(d.originalIndex);
+                    });
+            });
+
+            const bounds = g.node().getBBox();
+            const scale = Math.min(width / bounds.width, height / bounds.height) * 0.8;
+            const translateX = width / 2 - (bounds.x + bounds.width / 2) * scale;
+            const translateY = height / 2 - (bounds.y + bounds.height / 2) * scale;
+            
+            initialTransform = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
 
             zoom = d3.zoom()
-                .scaleExtent([0.1, 10])
-                .on('zoom', (event) => {
-                    g.attr('transform', event.transform);
-                });
-
-            svg.call(zoom);
-            g = svg.append('g');
-
-            simulation = d3.forceSimulation(nodes)
-                .force('link', d3.forceLink(links)
-                    .id(d => d.id)
-                    .distance(d => {
-                        const target = typeof d.target === 'object' ? d.target : nodes.find(n => n.id === d.target);
-                        return target && target.type === 'verse' ? 50 : 150;
-                    })
-                    .strength(0.5))
-                .force('charge', d3.forceManyBody()
-                    .strength(d => {
-                        if (d.type === 'verse') return -30;
-                        if (d.type === 'deity') return -500;
-                        if (d.type === 'mood') return -400;
-                        return -300;
-                    }))
-                .force('center', d3.forceCenter(width / 2, height / 2))
-                .force('collision', d3.forceCollide().radius(d => {
-                    if (d.type === 'verse') return 10;
-                    if (d.type === 'deity') return 25;
-                    if (d.type === 'mood') return 22;
-                    return 18;
-                }))
-                .velocityDecay(0.6)
-                .alphaDecay(0.02);
-
-            link = g.append('g')
-                .selectAll('line')
-                .data(links)
-                .join('line')
-                .attr('class', 'link');
-
-            node = g.append('g')
-                .selectAll('circle')
-                .data(nodes)
-                .join('circle')
-                .attr('class', 'node')
-                .attr('r', d => {
-                    if (d.type === 'verse') return 5;
-                    if (d.type === 'deity') return 12;
-                    if (d.type === 'mood') return 10;
-                    return 8;
-                })
-                .attr('fill', d => {
-                    if (d.type === 'deity') return 'url(#deity-gradient)';
-                    if (d.type === 'mood') return 'url(#mood-gradient)';
-                    if (d.type === 'tag') return 'url(#tag-gradient)';
-                    return '#fff';
-                })
-                .attr('stroke', d => d.type === 'verse' ? '#D4AF37' : 'none')
-                .attr('stroke-width', d => d.type === 'verse' ? 1.5 : 0)
-                .on('mouseenter', handleNodeHover)
-                .on('mouseleave', handleNodeLeave)
-                .on('click', handleNodeClick)
-                .call(d3.drag()
-                    .on('start', dragStarted)
-                    .on('drag', dragged)
-                    .on('end', dragEnded));
-
-            label = g.append('g')
-                .selectAll('text')
-                .data(nodes.filter(d => d.type !== 'verse'))
-                .join('text')
-                .attr('class', 'node-label')
-                .attr('dy', d => {
-                    if (d.type === 'deity') return -16;
-                    if (d.type === 'mood') return -14;
-                    return -12;
-                })
-                .text(d => d.label)
-                .style('font-size', d => {
-                    if (d.type === 'deity') return '13px';
-                    if (d.type === 'mood') return '12px';
-                    return '11px';
-                });
-
-            const defs = svg.append('defs');
-
-            const deityGradient = defs.append('linearGradient')
-                .attr('id', 'deity-gradient')
-                .attr('x1', '0%').attr('y1', '0%')
-                .attr('x2', '100%').attr('y2', '100%');
-            deityGradient.append('stop').attr('offset', '0%').attr('stop-color', '#ff6b6b');
-            deityGradient.append('stop').attr('offset', '100%').attr('stop-color', '#ff8e53');
-
-            const moodGradient = defs.append('linearGradient')
-                .attr('id', 'mood-gradient')
-                .attr('x1', '0%').attr('y1', '0%')
-                .attr('x2', '100%').attr('y2', '100%');
-            moodGradient.append('stop').attr('offset', '0%').attr('stop-color', '#ffd93d');
-            moodGradient.append('stop').attr('offset', '100%').attr('stop-color', '#f6c344');
-
-            const tagGradient = defs.append('linearGradient')
-                .attr('id', 'tag-gradient')
-                .attr('x1', '0%').attr('y1', '0%')
-                .attr('x2', '100%').attr('y2', '100%');
-            tagGradient.append('stop').attr('offset', '0%').attr('stop-color', '#6bcfff');
-            tagGradient.append('stop').attr('offset', '100%').attr('stop-color', '#4da8da');
-
-            simulation.on('tick', () => {
-                link
-                    .attr('x1', d => d.source.x)
-                    .attr('y1', d => d.source.y)
-                    .attr('x2', d => d.target.x)
-                    .attr('y2', d => d.target.y);
-
-                node
-                    .attr('cx', d => d.x)
-                    .attr('cy', d => d.y);
-
-                label
-                    .attr('x', d => d.x)
-                    .attr('y', d => d.y);
-            });
-        }
-
-        function handleNodeHover(event, d) {
-            d3.select(this)
-                .transition()
-                .duration(200)
-                .attr('r', () => {
-                    if (d.type === 'verse') return 7;
-                    if (d.type === 'deity') return 14;
-                    if (d.type === 'mood') return 12;
-                    return 10;
-                });
-
-            const tooltip = document.getElementById('tooltip');
-            if (d.type !== 'verse') {
-                tooltip.innerHTML = `<strong>${d.label}</strong><br>${d.count} verses`;
-                tooltip.style.display = 'block';
-                tooltip.style.left = (event.pageX + 10) + 'px';
-                tooltip.style.top = (event.pageY + 10) + 'px';
-            }
-        }
-
-        function handleNodeLeave(event, d) {
-            d3.select(this)
-                .transition()
-                .duration(200)
-                .attr('r', () => {
-                    if (d.type === 'verse') return 5;
-                    if (d.type === 'deity') return 12;
-                    if (d.type === 'mood') return 10;
-                    return 8;
-                });
-
-            document.getElementById('tooltip').style.display = 'none';
-        }
-
-        function handleNodeClick(event, d) {
-            event.stopPropagation();
-
-            if (d.type === 'verse') {
-                openVerseModal(d.verseIndex);
-            } else {
-                if (selectedNode === d.id) {
-                    resetNetworkView();
-                } else {
-                    selectNode(d);
-                }
-            }
-        }
-
-        function selectNode(d) {
-            selectedNode = d.id;
-
-            const selectedCircle = node.filter(n => n.id === d.id);
-            selectedCircle.classed('pulse', true);
-            setTimeout(() => selectedCircle.classed('pulse', false), 1800);
-
-            const connectedIds = new Set();
-            connectedIds.add(d.id);
+                .scaleExtent([initialTransform.k, initialTransform.k * 50])
+                .on('zoom', (event) => g.attr('transform', event.transform));
             
-            links.forEach(link => {
-                if (link.source.id === d.id || link.source === d.id) {
-                    connectedIds.add(typeof link.target === 'object' ? link.target.id : link.target);
-                }
-                if (link.target.id === d.id || link.target === d.id) {
-                    connectedIds.add(typeof link.source === 'object' ? link.source.id : link.source);
-                }
-            });
-
-            node.transition()
-                .duration(300)
-                .style('opacity', n => connectedIds.has(n.id) ? 1 : 0.1);
-
-            label.transition()
-                .duration(300)
-                .style('opacity', n => connectedIds.has(n.id) ? 1 : 0.1);
-
-            link.classed('active', false)
-                .transition()
-                .duration(300)
-                .style('opacity', l => {
-                    const sourceId = typeof l.source === 'object' ? l.source.id : l.source;
-                    const targetId = typeof l.target === 'object' ? l.target.id : l.target;
-                    if (sourceId === d.id || targetId === d.id) {
-                        return 1;
-                    }
-                    return 0.02;
-                });
-
-            link.each(function(l) {
-                const sourceId = typeof l.source === 'object' ? l.source.id : l.source;
-                const targetId = typeof l.target === 'object' ? l.target.id : l.target;
-                if (sourceId === d.id || targetId === d.id) {
-                    d3.select(this).classed('active', true);
-                }
-            });
-
-            const bbox = {
-                x: d.x - 200,
-                y: d.y - 200,
-                width: 400,
-                height: 400
-            };
-            zoomToBbox(bbox);
+            svg.call(zoom).call(zoom.transform, initialTransform);
         }
 
-        function resetNetworkView() {
-            selectedNode = null;
+        function zoomToMandala(mandalaData) {
+            const width = svg.attr('width');
+            const height = svg.attr('height');
+            const scale = initialTransform.k * 3.5;
 
-            node.transition()
-                .duration(300)
-                .style('opacity', 1);
-
-            label.transition()
-                .duration(300)
-                .style('opacity', 1);
-
-            link.classed('active', false)
-                .transition()
-                .duration(300)
-                .style('opacity', 1);
+            const transform = d3.zoomIdentity
+                .translate(width / 2, height / 2)
+                .scale(scale)
+                .translate(-mandalaData.x, -mandalaData.y);
+            
+            svg.transition().duration(1000).call(zoom.transform, transform);
         }
+        
+        function zoomToVerse(verseIndex) {
+            const verse = verses[verseIndex];
+            const mandala = mandalas.find(m => m.mandalaNum === verse.mandala);
+            if (!mandala) return;
 
-        function zoomToBbox(bbox) {
-            const container = document.getElementById('viz-container');
-            const width = container.clientWidth;
-            const height = container.clientHeight;
+            const width = svg.attr('width');
+            const height = svg.attr('height');
+            const scale = initialTransform.k * 30;
 
-            const dx = bbox.width;
-            const dy = bbox.height;
-            const x = bbox.x + dx / 2;
-            const y = bbox.y + dy / 2;
-            const scale = Math.min(8, 0.9 / Math.max(dx / width, dy / height));
-            const translate = [width / 2 - scale * x, height / 2 - scale * y];
-
+            const targetX = mandala.x + verse.x;
+            const targetY = mandala.y + verse.y;
+            
+            const transform = d3.zoomIdentity
+              .translate(width / 2, height / 2)
+              .scale(scale)
+              .translate(-targetX, -targetY);
+            
             svg.transition()
-                .duration(750)
-                .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
+                .duration(2000)
+                .call(zoom.transform, transform)
+                .on('end', () => openVerseModal(verseIndex));
         }
 
-        function dragStarted(event, d) {
-            if (!event.active) simulation.alphaTarget(0.3).restart();
-            d.fx = d.x;
-            d.fy = d.y;
-        }
-
-        function dragged(event, d) {
-            d.fx = event.x;
-            d.fy = event.y;
-        }
-
-        function dragEnded(event, d) {
-            if (!event.active) simulation.alphaTarget(0);
-            d.fx = null;
-            d.fy = null;
-        }
-
-        function openVerseModal(verseIndex) {
-            currentVerseIndex = verseIndex;
-            const verse = data[verseIndex];
-
-            document.getElementById('modal-header').textContent = 
-                `Mandala ${verse.mandala} • Sukta ${verse.sukta} • Verse ${verse.verse}`;
+        function openVerseModal(vIndex) {
+            currentVerseIndex = vIndex;
+            const verse = verses[currentVerseIndex];
+            document.getElementById('modal-header').textContent = `Mandala ${verse.mandala} • Sukta ${verse.sukta} • Verse ${verse.verse}`;
+            document.getElementById('modal-devanagari').textContent = verse.devanagari || '';
+            document.getElementById('modal-transliteration').textContent = (verse.transliteration || '').replace(/<BR>/gi, ' ');
+            document.getElementById('modal-translation').textContent = verse.translation_griffith || '';
 
             const tagsContainer = document.getElementById('modal-tags');
             tagsContainer.innerHTML = '';
+            const createPill = (text) => {
+                const pill = document.createElement('div'); pill.className = 'tag-pill'; pill.textContent = text; tagsContainer.appendChild(pill);
+            };
+            if (verse.deity) createPill(verse.deity); if (verse.mood) createPill(verse.mood); if (verse.tags) verse.tags.forEach(createPill);
 
-            if (verse.deity) {
-                const pill = document.createElement('div');
-                pill.className = 'tag-pill';
-                pill.textContent = verse.deity;
-                pill.dataset.nodeId = `deity-${verse.deity}`;
-                pill.onclick = () => handleTagClick(pill.dataset.nodeId);
-                tagsContainer.appendChild(pill);
-            }
-
-            if (verse.mood) {
-                const pill = document.createElement('div');
-                pill.className = 'tag-pill';
-                pill.textContent = verse.mood;
-                pill.dataset.nodeId = `mood-${verse.mood}`;
-                pill.onclick = () => handleTagClick(pill.dataset.nodeId);
-                tagsContainer.appendChild(pill);
-            }
-
-            if (verse.tags && Array.isArray(verse.tags) && verse.tags.length > 0) {
-                verse.tags.forEach(tag => {
-                    const pill = document.createElement('div');
-                    pill.className = 'tag-pill';
-                    pill.textContent = tag;
-                    pill.dataset.nodeId = `tag-${tag}`;
-                    pill.onclick = () => handleTagClick(pill.dataset.nodeId);
-                    tagsContainer.appendChild(pill);
-                });
-            }
-
-            const devanagariText = verse.devanagari || '';
-            document.getElementById('modal-devanagari').textContent = devanagariText;
+            const sortedIndex = verses.findIndex(v => v.originalIndex === currentVerseIndex);
+            document.getElementById('prev-btn').disabled = sortedIndex <= 0;
+            document.getElementById('next-btn').disabled = sortedIndex >= verses.length - 1;
             
-            const transliterationText = (verse.transliteration || '').replace(/<BR>/gi, ' ');
-            document.getElementById('modal-transliteration').textContent = transliterationText;
-            
-            document.getElementById('modal-translation').textContent = verse.translation_griffith || '';
-
-            document.getElementById('prev-btn').disabled = verseIndex === 0;
-            document.getElementById('next-btn').disabled = verseIndex === data.length - 1;
-
             document.getElementById('modal-backdrop').style.display = 'flex';
         }
 
         function closeVerseModal() {
             document.getElementById('modal-backdrop').style.display = 'none';
-            currentVerseIndex = -1;
         }
 
-        function handleTagClick(nodeId) {
-            closeVerseModal();
-            const targetNode = nodes.find(n => n.id === nodeId);
-            if (targetNode) {
-                selectNode(targetNode);
-            }
-        }
-
-        function navigateToPrevious() {
-            if (currentVerseIndex > 0) {
-                openVerseModal(currentVerseIndex - 1);
-            }
-        }
-
-        function navigateToNext() {
-            if (currentVerseIndex < data.length - 1) {
-                openVerseModal(currentVerseIndex + 1);
+        function navigateTo(direction) {
+            const sortedIndex = verses.findIndex(v => v.originalIndex === currentVerseIndex);
+            const nextIndex = sortedIndex + direction;
+            if (nextIndex >= 0 && nextIndex < verses.length) {
+                openVerseModal(verses[nextIndex].originalIndex);
             }
         }
 
         function navigateToRandom() {
-            const randomIndex = Math.floor(Math.random() * data.length);
-            openVerseModal(randomIndex);
+            closeVerseModal();
+            const randomIndex = Math.floor(Math.random() * verses.length);
+            zoomToVerse(randomIndex);
         }
 
         function setupEventListeners() {
-            const searchInput = document.getElementById('search-input');
-            const autocompleteDropdown = document.getElementById('autocomplete-dropdown');
-
-            searchInput.addEventListener('input', (e) => {
-                const query = e.target.value.trim().toLowerCase();
-
-                if (query.length < 2) {
-                    autocompleteDropdown.style.display = 'none';
-                    return;
-                }
-
-                const results = searchIndex
-                    .filter(item => item.label.toLowerCase().includes(query))
-                    .slice(0, 8);
-
-                if (results.length === 0) {
-                    autocompleteDropdown.style.display = 'none';
-                    return;
-                }
-
-                autocompleteDropdown.innerHTML = results.map(item => {
-                    const emoji = item.type === 'deity' ? '🔥' : 
-                                 item.type === 'mood' ? '🌙' : '🏷️';
-                    return `
-                        <div class="autocomplete-item" data-node-id="${item.id}">
-                            <span class="autocomplete-label">${emoji} ${item.label}</span>
-                            <span class="autocomplete-count">(${item.count} verses)</span>
-                        </div>
-                    `;
-                }).join('');
-
-                autocompleteDropdown.style.display = 'block';
-
-                autocompleteDropdown.querySelectorAll('.autocomplete-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        const nodeId = item.dataset.nodeId;
-                        const targetNode = nodes.find(n => n.id === nodeId);
-                        if (targetNode) {
-                            selectNode(targetNode);
-                            searchInput.value = '';
-                            autocompleteDropdown.style.display = 'none';
-                        }
-                    });
-                });
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!searchInput.contains(e.target) && !autocompleteDropdown.contains(e.target)) {
-                    autocompleteDropdown.style.display = 'none';
-                }
-            });
-
-            document.getElementById('zoom-in').addEventListener('click', () => {
-                svg.transition().duration(300).call(zoom.scaleBy, 1.3);
-            });
-
-            document.getElementById('zoom-out').addEventListener('click', () => {
-                svg.transition().duration(300).call(zoom.scaleBy, 0.7);
-            });
-
-            document.getElementById('reset-view').addEventListener('click', () => {
-                resetNetworkView();
-                svg.transition().duration(750).call(
-                    zoom.transform,
-                    d3.zoomIdentity.translate(
-                        document.getElementById('viz-container').clientWidth / 2,
-                        document.getElementById('viz-container').clientHeight / 2
-                    ).scale(1)
-                );
-            });
-
+            document.getElementById('random-verse-btn').addEventListener('click', navigateToRandom);
+            document.getElementById('zoom-in').addEventListener('click', () => svg.transition().duration(300).call(zoom.scaleBy, 1.5));
+            document.getElementById('zoom-out').addEventListener('click', () => svg.transition().duration(300).call(zoom.scaleBy, 0.7));
+            document.getElementById('reset-view').addEventListener('click', () => svg.transition().duration(750).call(zoom.transform, initialTransform));
+            
             document.getElementById('modal-close').addEventListener('click', closeVerseModal);
-            document.getElementById('modal-backdrop').addEventListener('click', (e) => {
-                if (e.target.id === 'modal-backdrop') closeVerseModal();
-            });
-            document.getElementById('prev-btn').addEventListener('click', navigateToPrevious);
-            document.getElementById('next-btn').addEventListener('click', navigateToNext);
+            document.getElementById('modal-backdrop').addEventListener('click', (e) => { if (e.target.id === 'modal-backdrop') closeVerseModal(); });
+            document.getElementById('prev-btn').addEventListener('click', () => navigateTo(-1));
+            document.getElementById('next-btn').addEventListener('click', () => navigateTo(1));
             document.getElementById('random-btn').addEventListener('click', navigateToRandom);
 
             document.addEventListener('keydown', (e) => {
-                if (currentVerseIndex !== -1) {
-                    if (e.key === 'Escape') {
-                        closeVerseModal();
-                    } else if (e.key === 'ArrowLeft') {
-                        navigateToPrevious();
-                    } else if (e.key === 'ArrowRight') {
-                        navigateToNext();
-                    } else if (e.key === ' ') {
-                        e.preventDefault();
-                        navigateToRandom();
-                    }
+                if (document.getElementById('modal-backdrop').style.display === 'flex') {
+                    if (e.key === 'Escape') closeVerseModal();
+                    else if (e.key === 'ArrowLeft') document.getElementById('prev-btn').click();
+                    else if (e.key === 'ArrowRight') document.getElementById('next-btn').click();
                 }
-            });
-
-            if (svg && svg.on) {
-                svg.on('click', (event) => {
-                    if (event.target === svg.node()) {
-                        resetNetworkView();
-                    }
-                });
-            }
-
-            document.getElementById('retry-btn').addEventListener('click', () => {
-                document.getElementById('error').style.display = 'none';
-                document.getElementById('loading').style.display = 'flex';
-                location.reload();
             });
 
             window.addEventListener('resize', () => {
                 const container = document.getElementById('viz-container');
-                const width = container.clientWidth;
-                const height = container.clientHeight;
-                
-                svg.attr('width', width).attr('height', height);
-                simulation.force('center', d3.forceCenter(width / 2, height / 2));
-                simulation.alpha(0.3).restart();
+                svg.attr('width', container.clientWidth).attr('height', container.clientHeight);
+                initializeVisualization();
             });
         }
-
-        // Wait for D3 to load before initializing
-        if (typeof d3 === 'undefined') {
-            window.addEventListener('load', () => {
-                setTimeout(init, 100);
-            });
-        } else {
-            init();
-        }
+        
+        init();
     </script>
 </body>
 </html>
