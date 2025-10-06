@@ -1,11 +1,12 @@
 // ===================================================================
 // AUDIO SYSTEM
 // ===================================================================
+// ** THE FIX: Replaced broken Zapsplat URLs with new, reliable Pixabay URLs **
 const sounds = {
-    click: new Audio('https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-the-sound-pack-tree/tspt_multimedia_button_clickable_025.mp3'),
-    zoom: new Audio('https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-the-sound-pack-tree/tspt_multimedia_swoosh_generic_001.mp3'),
-    open: new Audio('https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-the-sound-pack-tree/tspt_multimedia_button_generic_002.mp3'),
-    close: new Audio('https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-the-sound-pack-tree/tspt_multimedia_button_generic_004.mp3')
+    click: new Audio('https://cdn.pixabay.com/download/audio/2022/03/15/audio_2c64960538.mp3'), // Short UI click
+    zoom: new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_c38927d26e.mp3'),  // Quick swoosh
+    open: new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_a16ffcf384.mp3'),   // Positive open/confirm
+    close: new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_9e31f08be2.mp3')   // Subtle close/cancel
 };
 
 function playSound(sound) {
@@ -34,7 +35,6 @@ async function init() {
         if (!configResponse.ok) throw new Error('config.json not found or could not be loaded.');
         config = await configResponse.json();
 
-        // ** THE FIX: Populate the loading screen media right after getting config **
         const loadingMediaContainer = document.getElementById('loading-media-container');
         if (loadingMediaContainer) {
             let mediaElement;
