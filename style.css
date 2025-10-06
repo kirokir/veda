@@ -57,14 +57,13 @@ body {
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ** THE FIX: Main Title Style ** */
 #main-title {
     position: fixed;
     top: 1.5rem;
     left: 0;
     right: 0;
     text-align: center;
-    font-size: clamp(1.5rem, 4vw, 1.75rem); /* Smaller */
+    font-size: clamp(1.5rem, 4vw, 1.75rem);
     font-weight: 600;
     color: var(--gold);
     text-shadow: 0 0 15px var(--gold), 0 0 25px rgba(212, 175, 55, 0.4);
@@ -73,10 +72,9 @@ body {
     animation: fadeIn 0.8s ease-out;
 }
 
-/* ** THE FIX: Header container for subtitle and button ** */
 #header {
     position: fixed;
-    top: 4.5rem; /* Pushed down below new title */
+    top: 4.5rem;
     left: 0;
     right: 0;
     z-index: 100;
@@ -85,12 +83,11 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem; /* Space between subtitle and button */
+    gap: 1rem;
     pointer-events: none;
 }
 #header > * { pointer-events: all; }
 
-/* ** THE FIX: New subtitle style ** */
 #subtitle {
     font-size: clamp(0.8rem, 2.5vw, 0.9rem);
     font-weight: 400;
@@ -125,10 +122,12 @@ body {
 
 #viz-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; cursor: grab; }
 #viz-container:active { cursor: grabbing; }
+
+/* ** THE FIX: Moved controls to top left ** */
 #network-controls {
     position: fixed;
-    bottom: 2rem;
-    right: 2rem;
+    top: 1.5rem;   /* Changed from bottom */
+    left: 1.5rem;  /* Changed from right */
     z-index: 90;
     display: flex;
     flex-direction: column;
@@ -146,7 +145,10 @@ body {
 }
 .control-btn:hover { background: rgba(212, 175, 55, 0.2); transform: scale(1.1); }
 
-@media (max-width: 600px) { #network-controls { bottom: auto; top: 2rem; } }
+/* ** THE FIX: Removed the media query that was moving the controls on mobile ** */
+@media (max-width: 600px) {
+    /* The #network-controls rule was removed from here */
+}
 
 /* Modal Styles */
 #modal-backdrop, #info-modal-backdrop, #guide-modal-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1rem; animation: fadeIn 0.3s ease; }
