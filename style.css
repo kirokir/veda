@@ -16,7 +16,6 @@ body {
     position: relative;
 }
 
-/* Group for top right controls */
 #top-right-controls {
     position: fixed;
     top: 1rem;
@@ -43,7 +42,6 @@ body {
     color: var(--gold);
 }
 
-/* Info button style */
 #info-btn {
     width: 28px;
     height: 28px;
@@ -104,7 +102,7 @@ body {
     font-size: clamp(0.85rem, 2.5vw, 1rem);
     font-weight: 400;
     color: var(--text-light);
-    max-width: 550px;
+    max-width: 600px; /* Adjusted max-width */
     margin: 0 auto 1.5rem auto;
     line-height: 1.6;
     animation: fadeInUp 0.8s ease-out 0.4s;
@@ -183,10 +181,20 @@ body {
 #modal-devanagari { font-family: 'Noto Serif Devanagari', serif; font-size: 1.75rem; text-align: center; margin-bottom: 1.5rem; line-height: 1.8; color: #fff; }
 #modal-transliteration { font-style: italic; text-align: center; color: var(--text-light); margin-bottom: 1.5rem; font-size: 1.125rem; }
 #modal-translation { text-align: center; line-height: 1.8; color: rgba(255, 255, 255, 0.9); margin-bottom: 2rem; font-size: 1.125rem; }
-#modal-nav { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+#modal-nav { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+#modal-nav > div { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 .nav-btn { padding: 0.75rem 1.5rem; background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; color: var(--gold); font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; }
 .nav-btn:hover:not(:disabled) { background: rgba(212, 175, 55, 0.2); transform: translateY(-2px); }
 .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* NEW: Footer note style */
+.modal-footer-note {
+    width: 100%;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-top: 0.5rem;
+}
 
 #speaker-btn {
     position: absolute; top: 1rem; left: 1rem;
@@ -218,7 +226,7 @@ body {
 
 /* SVG Styles */
 .central-media-container { pointer-events: none; }
-.central-media-content { width:100%; height:100%; border-radius: 12px; object-fit: cover; }
+.central-media-content { width:100%; height:100%; object-fit: cover; }
 .mandala-circle {
     stroke: var(--gold); stroke-width: 0.5px;
     fill: white; transition: transform 0.3s ease; cursor: pointer;

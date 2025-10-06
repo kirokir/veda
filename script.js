@@ -23,14 +23,13 @@ let mandalas = [];
 let svg, g, zoom;
 let currentVerseIndex = -1;
 let initialTransform;
-let config = {}; // To store the loaded config
+let config = {};
 
 // ===================================================================
 // INITIALIZATION
 // ===================================================================
 async function init() {
     try {
-        // ** NEW: Fetch config file first **
         const configResponse = await fetch('./config.json');
         if (!configResponse.ok) throw new Error('config.json not found or could not be loaded.');
         config = await configResponse.json();
@@ -94,23 +93,34 @@ function initializeVisualization() {
 
     svg = d3.select('#network-svg').attr('width', width).attr('height', height);
     g = svg.append('g');
-    
+
+    // ** THE FIX: Dynamic Centering below the header **
+    const header = document.getElementById('header');
+    const headerHeight = header ? header.offsetHeight : 150; // Fallback height
+    const availableHeight = height - headerHeight;
+    const vizCenterY = headerHeight + (availableHeight / 2);
+    const vizCenterX = width / 2;
+
+    // ** THE FIX: Circular crop for central media **
+    const centralRadius = 110; // Make the central element bigger
+    const defs = g.append('defs');
+    defs.append('clipPath').attr('id', 'media-clip')
+        .append('circle').attr('r', centralRadius);
+
     g.append('circle')
-        .attr('r', 90)
+        .attr('r', centralRadius)
         .attr('fill', 'var(--gold)');
     
-    // ** NEW: Dynamic central media from config.json **
-    const mediaSize = 120;
     const foreignObject = g.append('foreignObject')
-        .attr('width', mediaSize)
-        .attr('height', mediaSize)
-        .attr('x', -mediaSize / 2)
-        .attr('y', -mediaSize / 2)
-        .attr('class', 'central-media-container');
+        .attr('width', centralRadius * 2)
+        .attr('height', centralRadius * 2)
+        .attr('x', -centralRadius)
+        .attr('y', -centralRadius)
+        .attr('clip-path', 'url(#media-clip)'); // Apply the circular crop
 
     if (config.mediaType === 'video') {
         foreignObject.html(`<video src="${config.mediaURL}" class="central-media-content" autoplay loop muted playsinline></video>`);
-    } else { // Default to image/gif
+    } else {
         foreignObject.html(`<img src="${config.mediaURL}" class="central-media-content">`);
     }
 
@@ -145,9 +155,11 @@ function initializeVisualization() {
     });
 
     const bounds = g.node().getBBox();
-    const scale = Math.min(width / bounds.width, height / bounds.height) * 0.85;
-    const translateX = width / 2 - (bounds.x + bounds.width / 2) * scale;
-    const translateY = height / 2 - (bounds.y + bounds.height / 2) * scale;
+    const scale = Math.min(width / bounds.width, availableHeight / bounds.height) * 0.85;
+    
+    // ** THE FIX: Use new center for translation **
+    const translateX = vizCenterX - (bounds.x + bounds.width / 2) * scale;
+    const translateY = vizCenterY - (bounds.y + bounds.height / 2) * scale;
     
     initialTransform = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
 
@@ -159,15 +171,19 @@ function initializeVisualization() {
 }
 
 // ===================================================================
-// NAVIGATION & MODALS
+// NAVIGATION & MODALS (No changes in this section)
 // ===================================================================
 function zoomToMandala(mandalaData) {
     const width = svg.attr('width');
     const height = svg.attr('height');
+    const headerHeight = document.getElementById('header')?.offsetHeight || 150;
+    const availableHeight = height - headerHeight;
+    const vizCenterY = headerHeight + availableHeight / 2;
+    const vizCenterX = width / 2;
+    
     const scale = initialTransform.k * 3.5;
-
     const transform = d3.zoomIdentity
-        .translate(width / 2, height / 2)
+        .translate(vizCenterX, vizCenterY)
         .scale(scale)
         .translate(-mandalaData.x, -mandalaData.y);
     
@@ -181,13 +197,17 @@ function zoomToVerse(verseIndex) {
 
     const width = svg.attr('width');
     const height = svg.attr('height');
+    const headerHeight = document.getElementById('header')?.offsetHeight || 150;
+    const availableHeight = height - headerHeight;
+    const vizCenterY = headerHeight + availableHeight / 2;
+    const vizCenterX = width / 2;
+    
     const scale = initialTransform.k * 30;
-
     const targetX = mandala.x + verse.x;
     const targetY = mandala.y + verse.y;
     
     const transform = d3.zoomIdentity
-      .translate(width / 2, height / 2)
+      .translate(vizCenterX, vizCenterY)
       .scale(scale)
       .translate(-targetX, -targetY);
     
@@ -266,7 +286,6 @@ function setupEventListeners() {
     document.getElementById('zoom-out').addEventListener('click', () => { playSound('click'); svg.transition().duration(300).call(zoom.scaleBy, 0.7); });
     document.getElementById('reset-view').addEventListener('click', () => { playSound('zoom'); svg.transition().duration(750).call(zoom.transform, initialTransform); });
     
-    // Verse Modal listeners
     document.querySelector('#modal-backdrop .modal-close-btn').addEventListener('click', closeVerseModal);
     document.getElementById('modal-backdrop').addEventListener('click', (e) => { if (e.target.id === 'modal-backdrop') closeVerseModal(); });
     document.getElementById('prev-btn').addEventListener('click', () => navigateTo(-1));
@@ -277,7 +296,6 @@ function setupEventListeners() {
         showToast('Audio will be added in version 2. Thank you for your patience.');
     });
 
-    // ** NEW: Info Modal listeners **
     const infoModal = document.getElementById('info-modal-backdrop');
     document.getElementById('info-btn').addEventListener('click', () => {
         playSound('open');
@@ -311,4 +329,4 @@ function setupEventListeners() {
     });
 }
         
-init();
+init();```
