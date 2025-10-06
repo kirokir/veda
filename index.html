@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Veda One</title>
     
-    <!-- FAVICON -->
     <link rel="icon" href="https://api.iconify.design/twemoji/om.svg?color=%23d4af37" type="image/svg+xml">
     
     <link rel="stylesheet" href="style.css">
@@ -23,11 +22,13 @@
     </div>
     <div id="error" style="display: none;"><div id="error-message"></div></div>
 
-    <a id="developer-link" href="https://dear.is-a.dev/" target="_blank" rel="noopener noreferrer">Visit Developer</a>
+    <div id="top-right-controls">
+        <a id="developer-link" href="https://dear.is-a.dev/" target="_blank" rel="noopener noreferrer">Visit Developer</a>
+        <button id="info-btn" title="Note from Developer">i</button>
+    </div>
 
     <div id="header">
         <h1 id="title">Veda One</h1>
-        <!-- UPDATED SUBTITLE -->
         <p id="subtitle">10,552 Verses from the 10 mandalas of the Rigveda. what you see is the rig veda with each circle being a mandal and each dot being a verse.</p>
         <button id="random-verse-btn">🌠 See what the Veda has to say to you</button>
     </div>
@@ -40,10 +41,10 @@
         <button class="control-btn" id="reset-view" title="Reset View">↺</button>
     </div>
 
+    <!-- Verse Modal -->
     <div id="modal-backdrop">
         <div id="modal">
-            <div id="modal-close">×</div>
-            <!-- SPEAKER ICON -->
+            <div class="modal-close-btn">×</div>
             <button id="speaker-btn" title="Text-to-Speech">🔊</button>
             <div id="modal-header"></div>
             <div id="modal-tags"></div>
@@ -55,6 +56,20 @@
                 <button class="nav-btn" id="random-btn">🎲 New Verse</button>
                 <button class="nav-btn" id="next-btn">Next →</button>
             </div>
+        </div>
+    </div>
+    
+    <!-- NEW: Info Modal -->
+    <div id="info-modal-backdrop">
+        <div id="modal">
+            <div class="modal-close-btn">×</div>
+            <h2 class="info-header">Note from Dev</h2>
+            <ul>
+                <li>This was developed in 2 days.</li>
+                <li>All verses are stored in a database; there is not even one verse skipped.</li>
+                <li>Translation for some verses has been skipped due to the unavailability of copyright-free material.</li>
+            </ul>
+            <p class="info-footer">Wishing you all the best in reviving the culture.</p>
         </div>
     </div>
 

@@ -10,8 +10,8 @@ const sounds = {
 
 function playSound(sound) {
     if (sounds[sound]) {
-        sounds[sound].currentTime = 0; // Rewind to the start
-        sounds[sound].play();
+        sounds[sound].currentTime = 0;
+        sounds[sound].play().catch(e => console.error("Audio play failed:", e));
     }
 }
 
@@ -23,12 +23,18 @@ let mandalas = [];
 let svg, g, zoom;
 let currentVerseIndex = -1;
 let initialTransform;
+let config = {}; // To store the loaded config
 
 // ===================================================================
 // INITIALIZATION
 // ===================================================================
 async function init() {
     try {
+        // ** NEW: Fetch config file first **
+        const configResponse = await fetch('./config.json');
+        if (!configResponse.ok) throw new Error('config.json not found or could not be loaded.');
+        config = await configResponse.json();
+
         if (typeof d3 === 'undefined') throw new Error('D3.js failed to load.');
         const response = await fetch('./rigveda_data_augmented.json');
         if (!response.ok) throw new Error(`Failed to load data: ${response.status}`);
@@ -53,7 +59,7 @@ async function init() {
         console.error('Initialization Error:', error);
         const errDiv = document.getElementById('error');
         const errMsg = document.getElementById('error-message');
-        errMsg.textContent = `Error: ${error.message}. Please ensure the data file is present and you are running this on a server.`;
+        errMsg.textContent = `Error: ${error.message}. Please ensure all files (including config.json) are present and you are running this on a server.`;
         errDiv.style.display = 'flex';
         document.getElementById('loading').style.display = 'none';
     }
@@ -93,15 +99,20 @@ function initializeVisualization() {
         .attr('r', 90)
         .attr('fill', 'var(--gold)');
     
-    // ** THE FIX: Replaced Om text with a foreignObject to embed a GIF/Image **
-    const gifSize = 120;
-    g.append('foreignObject')
-        .attr('width', gifSize)
-        .attr('height', gifSize)
-        .attr('x', -gifSize / 2)
-        .attr('y', -gifSize / 2)
-        .attr('class', 'central-gif-container')
-        .html('<img src="https://i.pinimg.com/originals/78/3a/a5/783aa55364cfe3f2f67a256a47e53da9.gif" style="width:100%; height:100%; border-radius: 12px;">');
+    // ** NEW: Dynamic central media from config.json **
+    const mediaSize = 120;
+    const foreignObject = g.append('foreignObject')
+        .attr('width', mediaSize)
+        .attr('height', mediaSize)
+        .attr('x', -mediaSize / 2)
+        .attr('y', -mediaSize / 2)
+        .attr('class', 'central-media-container');
+
+    if (config.mediaType === 'video') {
+        foreignObject.html(`<video src="${config.mediaURL}" class="central-media-content" autoplay loop muted playsinline></video>`);
+    } else { // Default to image/gif
+        foreignObject.html(`<img src="${config.mediaURL}" class="central-media-content">`);
+    }
 
     const mandalaGroups = g.selectAll('.mandala-group')
         .data(mandalas)
@@ -148,7 +159,7 @@ function initializeVisualization() {
 }
 
 // ===================================================================
-// NAVIGATION & INTERACTION
+// NAVIGATION & MODALS
 // ===================================================================
 function zoomToMandala(mandalaData) {
     const width = svg.attr('width');
@@ -231,27 +242,15 @@ function navigateToRandom() {
     zoomToVerse(randomIndex);
 }
 
-// ** NEW: Toast notification function **
 function showToast(message) {
     const toast = document.createElement('div');
     toast.className = 'toast-notification';
     toast.textContent = message;
     document.body.appendChild(toast);
 
-    // Trigger fade in
-    setTimeout(() => {
-        toast.classList.add('show');
-    }, 100);
-
-    // Start fade out after 3 seconds
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
-
-    // Remove from DOM after transition
-    setTimeout(() => {
-        document.body.removeChild(toast);
-    }, 3500);
+    setTimeout(() => { toast.classList.add('show'); }, 100);
+    setTimeout(() => { toast.classList.remove('show'); }, 3000);
+    setTimeout(() => { document.body.removeChild(toast); }, 3500);
 }
 
 // ===================================================================
@@ -263,29 +262,36 @@ function setupEventListeners() {
         navigateToRandom();
     });
 
-    document.getElementById('zoom-in').addEventListener('click', () => {
-        playSound('click');
-        svg.transition().duration(300).call(zoom.scaleBy, 1.5);
-    });
-    document.getElementById('zoom-out').addEventListener('click', () => {
-        playSound('click');
-        svg.transition().duration(300).call(zoom.scaleBy, 0.7);
-    });
-    document.getElementById('reset-view').addEventListener('click', () => {
-        playSound('zoom');
-        svg.transition().duration(750).call(zoom.transform, initialTransform);
-    });
+    document.getElementById('zoom-in').addEventListener('click', () => { playSound('click'); svg.transition().duration(300).call(zoom.scaleBy, 1.5); });
+    document.getElementById('zoom-out').addEventListener('click', () => { playSound('click'); svg.transition().duration(300).call(zoom.scaleBy, 0.7); });
+    document.getElementById('reset-view').addEventListener('click', () => { playSound('zoom'); svg.transition().duration(750).call(zoom.transform, initialTransform); });
     
-    document.getElementById('modal-close').addEventListener('click', closeVerseModal);
+    // Verse Modal listeners
+    document.querySelector('#modal-backdrop .modal-close-btn').addEventListener('click', closeVerseModal);
     document.getElementById('modal-backdrop').addEventListener('click', (e) => { if (e.target.id === 'modal-backdrop') closeVerseModal(); });
     document.getElementById('prev-btn').addEventListener('click', () => navigateTo(-1));
     document.getElementById('next-btn').addEventListener('click', () => navigateTo(1));
     document.getElementById('random-btn').addEventListener('click', navigateToRandom);
-
-    // ** NEW: Speaker button listener **
     document.getElementById('speaker-btn').addEventListener('click', () => {
         playSound('click');
         showToast('Audio will be added in version 2. Thank you for your patience.');
+    });
+
+    // ** NEW: Info Modal listeners **
+    const infoModal = document.getElementById('info-modal-backdrop');
+    document.getElementById('info-btn').addEventListener('click', () => {
+        playSound('open');
+        infoModal.style.display = 'flex';
+    });
+    infoModal.querySelector('.modal-close-btn').addEventListener('click', () => {
+        playSound('close');
+        infoModal.style.display = 'none';
+    });
+    infoModal.addEventListener('click', (e) => {
+        if (e.target.id === 'info-modal-backdrop') {
+            playSound('close');
+            infoModal.style.display = 'none';
+        }
     });
 
     document.addEventListener('keydown', (e) => {
@@ -293,6 +299,9 @@ function setupEventListeners() {
             if (e.key === 'Escape') closeVerseModal();
             else if (e.key === 'ArrowLeft') document.getElementById('prev-btn').click();
             else if (e.key === 'ArrowRight') document.getElementById('next-btn').click();
+        }
+        if (document.getElementById('info-modal-backdrop').style.display === 'flex') {
+             if (e.key === 'Escape') infoModal.style.display = 'none';
         }
     });
 
