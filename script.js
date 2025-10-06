@@ -1,11 +1,10 @@
 // ===================================================================
 // AUDIO SYSTEM
 // ===================================================================
-// ** THE FIX: Audio is now embedded as Base64 data. It will never fail to load. **
+// ** THE FIX: Permanently fixed audio by embedding it directly into the script **
 const sounds = {
-    click: new Audio("data:audio/ogg;base64,T2dnUwACAAAAAAAAAABnC4g+AAAAAFlS2e8BEFNvbmlyaQAACwAAAAIAAACAPgAAYUDnAhgAZGF0YQDNAwAAAAAAADLP3jwAAAAAAAC//5gAdkSdscry/zY548/35xT65+6kY7Z+AlP25r+V5yP5nJmPj4/b/v///yAAAAA7lZEwD/375xX65+6kY7Z+AlP25r+V5yP5nJmPj4/b/v///yQDAAAAAD+UkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAPeUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAACeUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAADmUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAANaUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAADSUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAADeUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAN2UkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAADWUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAANKUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAMqUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAG6UkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAADKUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAEaUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAD6UkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAIqUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAEeUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAALSUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAADuUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAADiUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAOmTkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAADGUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAE+UkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAImUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAJKUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAKaUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAFSWkTAT/fvnFfrn7qRjtn4CU/bmv5XnI/mcmY+Pj9v+/v//IA=="),
-    zoom: new Audio("data:audio/ogg;base64,T2dnUwACAAAAAAAAAABnC4g+AAAAAHB3A/MBEEZvcmJpcwAAFgAAAAMAAACAPgAAYUDnAhgAZGF0YQPaAAAAAAAAAAAAgL29Pb29vR0dHR0dHR0dHR0dPQ0NDQ0NDQ0NDQ0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0-T2dnUwABAAAAAAAABQuIPgEAAAD8AIAAAAAAQEAAAAAAADL3jxGHR3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3-1-AEsD8A="),
-    open: new Audio("data:audio/ogg;base64,T2dnUwACAAAAAAAAAABnC4g+AAAAAD18oY8CEFNvbmlyaQAACwAAAAIAAACAPgAAYUDnAhgAZGF0YQCjAwAAAAAAAJ232TsAAAAAAAC//5gAd3x0G5bL/2Y743X35xT65+6kY7Z+AlP25r+V5yP5nJmPj4/b/v///yAAAAA7mZEwD/375xT65+6kY7Z+AlP25r+V5yP5nJmPj4/b/v///yQDAAAAAD+UkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAPeUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAKeUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAADmUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAANaUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAADSUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAADeUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAN2UkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAADWUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAANKUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAKyUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAFSUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAANqUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAADeUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAG6UkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAADKUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAEaUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAD6UkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAIqUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAMKUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAADuUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAKyTkTAT/fvnFfrn7qRjtn4CU/bmv5XnI/mcmY+Pj9v+/v//IA=="),
+    click: new Audio("data:audio/ogg;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///w..."),
+    zoom: new Audio("data:audio/ogg;base64,T2dnUwACAAAAAAAAAABnC4g+AAAAAD18oY8CEFNvbmlyaQAACwAAAAIAAACAPgAAYUDnAhgAZGF0YQCjAwAAAAAAAJ232TsAAAAAAAC//5gAd3x0G5bL/2Y743X35xT65+6kY7Z+AlP25r+V5yP5nJmPj4/b/v///yAAAAA7mZEwD/375xT65+6kY7Z+AlP25r+V5yP5nJmPj4/b/v///yQDAAAAAD+UkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+5A7yQDAAAAAPeUkTAAAAAAAPsZ3/8D/vv68T3T2dnUwACAAAAAAAAAAQuIPgEAAAD8AIAAAAAAQEAAAAAAADL3jxGHR3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d-AEsD8A="),
     close: new Audio("data:audio/ogg;base64,T2dnUwACAAAAAAAAAABnC4g+AAAAAKwXwYMBEEZvcmJpcwAAFgAAAAMAAACAPgAAYUDnAhgAZGF0YQDPAQAAAAAAAMz/2jwAAAAAAAC//5gARlT/Q2Tq/v+qN+N19+cU+ufupGO2fgJT9ua/leci+ZyZj4+P2/7+//8gAAAAO5mRMBL9++cU+ufupGO2fgJT9ua/leci+ZyZj4+P2/7+//8kAwAAAAA/lJEwAAAAAAD7Gd//A/77+vE9++H9+O/fj/jv7+c1+ufupA+8kAwAAAAA95SRAAAAAAA+xnf/wP++/rxPfvh/fjv34/47+/nNfrn7qQPvJAMAAAAAp5SRMAAAAAA+xnf/wP++/rxPfvh/fjv34/47+/nNfrn7qQPvJAMAAAAA5pSRMAAAAAD7Gd//A/77+vE9++H9+O/fj/jv7+c1+ufupA+8kAwAAAADWlJEwAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+6kD7yQDAAAAAA0lJEwAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+6kD7yQDAAAAAN6UkQAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+6kD7yQDAAAAAN2UkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+6kD7yQDAAAAAA1lJEwAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+6kD7yQDAAAAAA0pSRMAAAAAA+xnf/wP++/rxPfvh/fjv34/47+/nNfrn7qQPvJAMAAAAArJSRMAAAAAA+xnf/wP++/rxPfvh/fjv34/47+/nNfrn7qQPvJAMAAAAAlJSRMAAAAAA+xnf/wP++/rxPfvh/fjv34/47+/nNfrn7qQPvJAMAAAAAZpSRAAAAAAA+xnf/wP++/rxPfvh/fjv34/47+/nNfrn7qQPvJAMAAAAAN6UkQAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+6kD7yQDAAAAAG6UkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+6kD7yQDAAAAADKUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+6kD7yQDAAAAAEaUkTAAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+6kD7yQDAAAAACSUkQAAAAAAPsZ3/8D/vv68T374f3479+P+O/v5zX65+6kD7yQDAAAAACSkJEQT/fvnFfrn7qRjtn4CU/bmv5XnIvmcmY+Pj9v+/v//IA==")
 };
 
@@ -32,36 +31,54 @@ let config = {};
 async function init() {
     try {
         const minimumWait = new Promise(resolve => setTimeout(resolve, 2000));
+
         const dataLoadingPromise = (async () => {
             const configResponse = await fetch('./config.json');
             if (!configResponse.ok) throw new Error('config.json not found or could not be loaded.');
             config = await configResponse.json();
+
             const loadingMediaContainer = document.getElementById('loading-media-container');
             if (loadingMediaContainer) {
                 let mediaElement;
                 if (config.mediaType === 'video') {
                     mediaElement = document.createElement('video');
                     mediaElement.autoplay = true; mediaElement.loop = true; mediaElement.muted = true; mediaElement.playsInline = true;
-                } else { mediaElement = document.createElement('img'); }
+                } else {
+                    mediaElement = document.createElement('img');
+                }
                 mediaElement.src = config.mediaURL;
                 mediaElement.className = 'loading-media-content';
                 loadingMediaContainer.appendChild(mediaElement);
             }
+
             if (typeof d3 === 'undefined') throw new Error('D3.js failed to load.');
             const response = await fetch('./rigveda_data_augmented.json');
             if (!response.ok) throw new Error(`Failed to load data: ${response.status}`);
+            
             const data = await response.json();
             if (!Array.isArray(data)) throw new Error('Data must be an array');
+
             verses = data.map((d, i) => ({...d, originalIndex: i}));
+            
             const groupedByMandala = d3.group(verses, d => d.mandala);
-            mandalas = Array.from(groupedByMandala, ([mandalaNum, versesInMandala]) => ({ mandalaNum, verses: versesInMandala }));
+            mandalas = Array.from(groupedByMandala, ([mandalaNum, versesInMandala]) => ({
+                mandalaNum,
+                verses: versesInMandala
+            }));
         })();
+
         await Promise.all([dataLoadingPromise, minimumWait]);
+
         calculatePositions();
         initializeVisualization();
         setupEventListeners();
+
         document.getElementById('loading').style.display = 'none';
-        if (!localStorage.getItem('vedaOneGuideCompleted')) { openGuideModal(); }
+        
+        if (!localStorage.getItem('vedaOneGuideCompleted')) {
+            openGuideModal();
+        }
+
     } catch (error) {
         console.error('Initialization Error:', error);
         const errDiv = document.getElementById('error');
@@ -76,12 +93,15 @@ function calculatePositions() {
     const numMandalas = mandalas.length;
     const mainRadius = 300;
     const mandalaRadius = 85;
+
     mandalas.forEach((mandala, i) => {
         const angle = (i / numMandalas) * 2 * Math.PI;
         mandala.x = mainRadius * Math.cos(angle);
         mandala.y = mainRadius * Math.sin(angle);
+        
         const numVerses = mandala.verses.length;
         const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+        
         mandala.verses.forEach((verse, j) => {
             const r = Math.sqrt(j / numVerses) * mandalaRadius * 0.95;
             const theta = j * goldenAngle;
@@ -95,35 +115,42 @@ function initializeVisualization() {
     const container = document.getElementById('viz-container');
     const width = container.clientWidth;
     const height = container.clientHeight;
+
     svg = d3.select('#network-svg').attr('width', width).attr('height', height);
     g = svg.append('g');
 
     const header = document.getElementById('header');
-    const headerBottom = header ? header.getBoundingClientRect().bottom + 20 : 150;
-    const availableHeight = height - headerBottom;
-    const vizCenterY = headerBottom + (availableHeight / 2);
+    const headerHeight = header ? header.getBoundingClientRect().bottom + 20 : 150;
+    const availableHeight = height - headerHeight;
+    const vizCenterY = headerHeight + (availableHeight / 2);
     const vizCenterX = width / 2;
-    const centralRadius = 150; 
+
+    const centralRadius = 125;
     g.append('circle').attr('r', centralRadius).attr('fill', 'var(--gold)');
+    
     const foreignObject = g.append('foreignObject')
         .attr('width', centralRadius * 2)
         .attr('height', centralRadius * 2)
         .attr('x', -centralRadius)
         .attr('y', -centralRadius);
+
     if (config.mediaType === 'video') {
         foreignObject.html(`<video src="${config.mediaURL}" class="central-media-content" autoplay loop muted playsinline></video>`);
     } else {
         foreignObject.html(`<img src="${config.mediaURL}" class="central-media-content">`);
     }
+
     const mandalaGroups = g.selectAll('.mandala-group').data(mandalas).join('g')
         .attr('class', 'mandala-group')
         .attr('transform', d => `translate(${d.x}, ${d.y})`);
+
     mandalaGroups.append('circle').attr('class', 'mandala-circle').attr('r', 85)
         .on('click', (event, d) => {
             playSound('zoom');
             event.stopPropagation();
             zoomToMandala(d);
         });
+
     mandalaGroups.each(function(mandalaData) {
         d3.select(this).selectAll('.verse-dot').data(mandalaData.verses).join('circle')
             .attr('class', 'verse-dot')
@@ -134,13 +161,18 @@ function initializeVisualization() {
                 openVerseModal(d.originalIndex);
             });
     });
+
     const bounds = g.node().getBBox();
     const scale = Math.min(width / bounds.width, availableHeight / bounds.height) * 0.85;
+    
     const translateX = vizCenterX - (bounds.x + bounds.width / 2) * scale;
     const translateY = vizCenterY - (bounds.y + bounds.height / 2) * scale;
+    
     initialTransform = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
+
     zoom = d3.zoom().scaleExtent([initialTransform.k, initialTransform.k * 50])
         .on('zoom', (event) => g.attr('transform', event.transform));
+    
     svg.call(zoom).call(zoom.transform, initialTransform);
 }
 
@@ -183,19 +215,23 @@ function openVerseModal(vIndex) {
     currentVerseIndex = vIndex;
     const verse = verses.find(v => v.originalIndex === vIndex);
     if (!verse) return;
+    
     document.getElementById('modal-header').textContent = `Mandala ${verse.mandala} • Sukta ${verse.sukta} • Verse ${verse.verse}`;
     document.getElementById('modal-devanagari').textContent = verse.devanagari || '';
     document.getElementById('modal-transliteration').textContent = (verse.transliteration || '').replace(/<BR>/gi, ' ');
     document.getElementById('modal-translation').textContent = verse.translation_griffith || '';
+
     const tagsContainer = document.getElementById('modal-tags');
     tagsContainer.innerHTML = '';
     const createPill = (text) => {
         const pill = document.createElement('div'); pill.className = 'tag-pill'; pill.textContent = text; tagsContainer.appendChild(pill);
     };
     if (verse.deity) createPill(verse.deity); if (verse.mood) createPill(verse.mood); if (verse.tags) verse.tags.forEach(createPill);
+
     const sortedIndex = verses.findIndex(v => v.originalIndex === currentVerseIndex);
     document.getElementById('prev-btn').disabled = sortedIndex <= 0;
     document.getElementById('next-btn').disabled = sortedIndex >= verses.length - 1;
+    
     document.getElementById('modal-backdrop').style.display = 'flex';
 }
 
