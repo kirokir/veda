@@ -1,12 +1,12 @@
 // ===================================================================
 // AUDIO SYSTEM
 // ===================================================================
-// ** THE FIX: Replaced broken Pixabay URLs with new, reliable jsdelivr CDN URLs **
+// ** THE FIX: Replaced broken URLs with new, permanent, and reliable CDN links **
 const sounds = {
-    click: new Audio('https://cdn.jsdelivr.net/gh/k-l-lambda/Front-end-Portfolio@8026105373305151525a401c37c22934685011a8/audio/click.mp3'),
-    zoom: new Audio('https://cdn.jsdelivr.net/gh/k-l-lambda/Front-end-Portfolio@8026105373305151525a401c37c22934685011a8/audio/swoosh.mp3'),
-    open: new Audio('https://cdn.jsdelivr.net/gh/k-l-lambda/Front-end-Portfolio@8026105373305151525a401c37c22934685011a8/audio/open.mp3'),
-    close: new Audio('https://cdn.jsdelivr.net/gh/k-l-lambda/Front-end-Portfolio@8026105373305151525a401c37c22934685011a8/audio/close.mp3')
+    click: new Audio('https://cdn.jsdelivr.net/gh/KenneyNL/Interface-Sounds/Audio/click_002.ogg'),
+    zoom: new Audio('https://cdn.jsdelivr.net/gh/KenneyNL/Interface-Sounds/Audio/swoosh_01.ogg'),
+    open: new Audio('https://cdn.jsdelivr.net/gh/KenneyNL/Interface-Sounds/Audio/confirmation_001.ogg'),
+    close: new Audio('https://cdn.jsdelivr.net/gh/KenneyNL/Interface-Sounds/Audio/back_001.ogg')
 };
 
 function playSound(sound) {
@@ -31,10 +31,8 @@ let config = {};
 // ===================================================================
 async function init() {
     try {
-        // ** THE FIX: Start a minimum 2-second timer immediately **
         const minimumWait = new Promise(resolve => setTimeout(resolve, 2000));
 
-        // Start all data fetching operations concurrently
         const dataLoadingPromise = (async () => {
             const configResponse = await fetch('./config.json');
             if (!configResponse.ok) throw new Error('config.json not found or could not be loaded.');
@@ -70,15 +68,12 @@ async function init() {
             }));
         })();
 
-        // ** THE FIX: Wait for BOTH the data to load AND the 2-second timer to finish **
         await Promise.all([dataLoadingPromise, minimumWait]);
 
-        // Now that data is loaded and 2 seconds have passed, build the visualization
         calculatePositions();
         initializeVisualization();
         setupEventListeners();
 
-        // Finally, hide the loading screen and then show the guide if needed
         document.getElementById('loading').style.display = 'none';
         
         if (!localStorage.getItem('vedaOneGuideCompleted')) {
