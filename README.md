@@ -1,4 +1,4 @@
-# Veda One 🕉️
+# Veda One 
 
 ### one verse a day, rig veda in your pocket
 
