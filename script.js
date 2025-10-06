@@ -38,8 +38,9 @@ async function init() {
 
 function calculatePositions() {
     const numMandalas = mandalas.length;
-    const mainRadius = 250; 
-    const mandalaRadius = 60; 
+    // ** THE FIX: Adjusted radii for new layout **
+    const mainRadius = 300;     // Distance of Mandalas from center
+    const mandalaRadius = 85;   // Size of the Mandala circles
 
     mandalas.forEach((mandala, i) => {
         const angle = (i / numMandalas) * 2 * Math.PI;
@@ -50,7 +51,7 @@ function calculatePositions() {
         const goldenAngle = Math.PI * (3 - Math.sqrt(5));
         
         mandala.verses.forEach((verse, j) => {
-            const r = Math.sqrt(j / numVerses) * mandalaRadius * 0.95;
+            const r = Math.sqrt(j / numVerses) * mandalaRadius * 0.95; // 95% to keep dots inside
             const theta = j * goldenAngle;
             verse.x = r * Math.cos(theta);
             verse.y = r * Math.sin(theta);
@@ -63,17 +64,21 @@ function initializeVisualization() {
     const width = container.clientWidth;
     const height = container.clientHeight;
 
-    // This re-selects the SVG, which is important after a resize clear
     svg = d3.select('#network-svg').attr('width', width).attr('height', height);
     g = svg.append('g');
     
+    // ** THE FIX: Central circle is now smaller **
     g.append('circle')
-        .attr('r', 150)
+        .attr('r', 90)
         .attr('fill', 'var(--gold)');
     
-    g.append('text')
-        .attr('class', 'om-symbol')
-        .text('🕉️');
+    // ** THE FIX: Replaced text emoji with an image element **
+    g.append('image')
+        .attr('href', 'https://api.iconify.design/twemoji/om.svg?color=%238a2be2') // You can replace this URL
+        .attr('width', 120)
+        .attr('height', 120)
+        .attr('x', -60) // Center horizontally (-width/2)
+        .attr('y', -60); // Center vertically (-height/2)
 
     const mandalaGroups = g.selectAll('.mandala-group')
         .data(mandalas)
@@ -81,9 +86,10 @@ function initializeVisualization() {
         .attr('class', 'mandala-group')
         .attr('transform', d => `translate(${d.x}, ${d.y})`);
 
+    // ** THE FIX: Mandala circles are now larger **
     mandalaGroups.append('circle')
         .attr('class', 'mandala-circle')
-        .attr('r', 60)
+        .attr('r', 85)
         .on('click', (event, d) => {
             event.stopPropagation();
             zoomToMandala(d);
@@ -96,7 +102,7 @@ function initializeVisualization() {
             .attr('class', 'verse-dot')
             .attr('cx', d => d.x)
             .attr('cy', d => d.y)
-            .attr('r', 0.75)
+            .attr('r', 1) // Slightly larger dots for visibility
             .on('click', (event, d) => {
                 event.stopPropagation();
                 openVerseModal(d.originalIndex);
@@ -104,7 +110,7 @@ function initializeVisualization() {
     });
 
     const bounds = g.node().getBBox();
-    const scale = Math.min(width / bounds.width, height / bounds.height) * 0.8;
+    const scale = Math.min(width / bounds.width, height / bounds.height) * 0.85; // Use 85% of screen
     const translateX = width / 2 - (bounds.x + bounds.width / 2) * scale;
     const translateY = height / 2 - (bounds.y + bounds.height / 2) * scale;
     
@@ -215,18 +221,10 @@ function setupEventListeners() {
         }
     });
 
-    // ===================================================================
-    // THE FIX IS HERE
-    // ===================================================================
     window.addEventListener('resize', () => {
-        // **THE FIX:** First, completely clear the SVG of all old elements.
         d3.select('#network-svg').html('');
-        
-        // Now, re-run the entire initialization function.
-        // This will redraw everything correctly based on the new window size.
         initializeVisualization();
     });
-    // ===================================================================
 }
         
 init();
