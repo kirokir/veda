@@ -102,7 +102,7 @@ body {
     font-size: clamp(0.85rem, 2.5vw, 1rem);
     font-weight: 400;
     color: var(--text-light);
-    max-width: 600px; /* Adjusted max-width */
+    max-width: 600px;
     margin: 0 auto 1.5rem auto;
     line-height: 1.6;
     animation: fadeInUp 0.8s ease-out 0.4s;
@@ -186,8 +186,6 @@ body {
 .nav-btn { padding: 0.75rem 1.5rem; background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; color: var(--gold); font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; }
 .nav-btn:hover:not(:disabled) { background: rgba(212, 175, 55, 0.2); transform: translateY(-2px); }
 .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-/* NEW: Footer note style */
 .modal-footer-note {
     width: 100%;
     text-align: center;
@@ -226,7 +224,13 @@ body {
 
 /* SVG Styles */
 .central-media-container { pointer-events: none; }
-.central-media-content { width:100%; height:100%; object-fit: cover; }
+/* ** THE FIX: CSS rule to make the media content circular ** */
+.central-media-content {
+    width:100%;
+    height:100%;
+    object-fit: cover;
+    border-radius: 50%; /* This is the key change */
+}
 .mandala-circle {
     stroke: var(--gold); stroke-width: 0.5px;
     fill: white; transition: transform 0.3s ease; cursor: pointer;

@@ -100,21 +100,19 @@ function initializeVisualization() {
     const vizCenterY = headerHeight + (availableHeight / 2);
     const vizCenterX = width / 2;
 
-    const centralRadius = 110;
-    const defs = g.append('defs');
-    defs.append('clipPath').attr('id', 'media-clip')
-        .append('circle').attr('r', centralRadius);
+    // ** THE FIX: Increased central radius for a bigger center element **
+    const centralRadius = 125;
 
     g.append('circle')
         .attr('r', centralRadius)
         .attr('fill', 'var(--gold)');
     
+    // The <foreignObject> remains the same, but the CSS will now make its content circular
     const foreignObject = g.append('foreignObject')
         .attr('width', centralRadius * 2)
         .attr('height', centralRadius * 2)
         .attr('x', -centralRadius)
-        .attr('y', -centralRadius)
-        .attr('clip-path', 'url(#media-clip)');
+        .attr('y', -centralRadius);
 
     if (config.mediaType === 'video') {
         foreignObject.html(`<video src="${config.mediaURL}" class="central-media-content" autoplay loop muted playsinline></video>`);

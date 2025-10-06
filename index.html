@@ -13,7 +13,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+Devanagari:wght@400;600&display.swap" rel="stylesheet">
 </head>
 <body>
     <div id="loading">
@@ -30,7 +30,11 @@
     <div id="header">
         <h1 id="title">Veda One</h1>
         <!-- UPDATED SUBTITLE -->
-        <p id="subtitle">10,552 Verses from the 10 mandalas of the Rigveda. what you see is the rig veda with each circle being a mandal and each dot being a verse. press button below or zoom in to any random dot- now your message for the day from the eternal text</p>
+        <p id="subtitle">
+            10,552 Verses from the 10 mandalas of the Rigveda.<br>
+            what you see is the rig veda with each circle being a mandal and each dot being a verse.<br>
+            press button below or zoom in to any random dot- to know your message for the day from the eternal text
+        </p>
         <button id="random-verse-btn">🌠 See what the Veda has to say to you</button>
     </div>
 
@@ -53,10 +57,11 @@
             <div id="modal-transliteration"></div>
             <div id="modal-translation"></div>
             <div id="modal-nav">
-                <button class="nav-btn" id="prev-btn">← Previous</button>
-                <button class="nav-btn" id="random-btn">🎲 New Verse</button>
-                <button class="nav-btn" id="next-btn">Next →</button>
-                <!-- UPDATED FOOTER NOTE -->
+                <div>
+                    <button class="nav-btn" id="prev-btn">← Previous</button>
+                    <button class="nav-btn" id="random-btn">🎲 New Verse</button>
+                    <button class="nav-btn" id="next-btn">Next →</button>
+                </div>
                 <p class="modal-footer-note">or come back tomorrow for tomorrow's message</p>
             </div>
         </div>
