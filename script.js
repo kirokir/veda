@@ -94,15 +94,13 @@ function initializeVisualization() {
     svg = d3.select('#network-svg').attr('width', width).attr('height', height);
     g = svg.append('g');
 
-    // ** THE FIX: Dynamic Centering below the header **
     const header = document.getElementById('header');
-    const headerHeight = header ? header.offsetHeight : 150; // Fallback height
+    const headerHeight = header ? header.offsetHeight : 150;
     const availableHeight = height - headerHeight;
     const vizCenterY = headerHeight + (availableHeight / 2);
     const vizCenterX = width / 2;
 
-    // ** THE FIX: Circular crop for central media **
-    const centralRadius = 110; // Make the central element bigger
+    const centralRadius = 110;
     const defs = g.append('defs');
     defs.append('clipPath').attr('id', 'media-clip')
         .append('circle').attr('r', centralRadius);
@@ -116,7 +114,7 @@ function initializeVisualization() {
         .attr('height', centralRadius * 2)
         .attr('x', -centralRadius)
         .attr('y', -centralRadius)
-        .attr('clip-path', 'url(#media-clip)'); // Apply the circular crop
+        .attr('clip-path', 'url(#media-clip)');
 
     if (config.mediaType === 'video') {
         foreignObject.html(`<video src="${config.mediaURL}" class="central-media-content" autoplay loop muted playsinline></video>`);
@@ -157,7 +155,6 @@ function initializeVisualization() {
     const bounds = g.node().getBBox();
     const scale = Math.min(width / bounds.width, availableHeight / bounds.height) * 0.85;
     
-    // ** THE FIX: Use new center for translation **
     const translateX = vizCenterX - (bounds.x + bounds.width / 2) * scale;
     const translateY = vizCenterY - (bounds.y + bounds.height / 2) * scale;
     
@@ -171,7 +168,7 @@ function initializeVisualization() {
 }
 
 // ===================================================================
-// NAVIGATION & MODALS (No changes in this section)
+// NAVIGATION & MODALS
 // ===================================================================
 function zoomToMandala(mandalaData) {
     const width = svg.attr('width');
