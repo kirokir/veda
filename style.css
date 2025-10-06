@@ -27,6 +27,11 @@ body {
     gap: 0.5rem;
 }
 
+#developer-link, #info-btn, #guide-btn {
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+
 #developer-link {
     background: rgba(255, 255, 255, 0.1);
     color: var(--text-light);
@@ -34,40 +39,27 @@ body {
     border-radius: 20px;
     font-size: 0.75rem;
     text-decoration: none;
-    backdrop-filter: blur(5px);
-    transition: all 0.3s ease;
 }
-#developer-link:hover {
-    background: rgba(212, 175, 55, 0.2);
-    color: var(--gold);
-}
+#developer-link:hover { background: rgba(212, 175, 55, 0.2); color: var(--gold); }
 
-#info-btn {
-    width: 28px;
-    height: 28px;
+#info-btn, #guide-btn {
+    width: 28px; height: 28px;
     border-radius: 50%;
     border: 1px solid var(--border-color);
     background: rgba(255, 255, 255, 0.1);
     color: var(--text-light);
-    font-family: 'Times New Roman', serif;
-    font-style: italic;
-    font-size: 1rem;
     cursor: pointer;
-    backdrop-filter: blur(5px);
-    transition: all 0.3s ease;
 }
-#info-btn:hover {
-    background: rgba(212, 175, 55, 0.2);
-    color: var(--gold);
-    transform: scale(1.1);
-}
+#info-btn { font-family: 'Times New Roman', serif; font-style: italic; font-size: 1rem; }
+#guide-btn { font-family: sans-serif; font-weight: bold; font-size: 1rem; }
+#info-btn:hover, #guide-btn:hover { background: rgba(212, 175, 55, 0.2); color: var(--gold); transform: scale(1.1); }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
 #header {
     position: fixed;
-    top: 0;
+    top: 2rem;
     left: 0;
     right: 0;
     z-index: 100;
@@ -76,38 +68,8 @@ body {
     animation: fadeIn 0.8s ease-out;
     pointer-events: none;
 }
-#header::before {
-    content: '';
-    position: absolute;
-    top: -100px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 600px;
-    height: 300px;
-    background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0) 70%);
-    z-index: -1;
-    pointer-events: none;
-}
 #header > * { pointer-events: all; }
-#title {
-    font-size: clamp(1.5rem, 4vw, 2rem);
-    font-weight: 700;
-    color: var(--gold);
-    text-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
-    margin-bottom: 0.5rem;
-    animation: fadeInUp 0.8s ease-out 0.2s;
-    animation-fill-mode: backwards;
-}
-#subtitle {
-    font-size: clamp(0.85rem, 2.5vw, 1rem);
-    font-weight: 400;
-    color: var(--text-light);
-    max-width: 600px;
-    margin: 0 auto 1.5rem auto;
-    line-height: 1.6;
-    animation: fadeInUp 0.8s ease-out 0.4s;
-    animation-fill-mode: backwards;
-}
+
 #random-verse-btn {
     background: rgba(212, 175, 55, 0.2);
     border: 1px solid rgba(212, 175, 55, 0.5);
@@ -152,8 +114,17 @@ body {
 }
 .control-btn:hover { background: rgba(212, 175, 55, 0.2); transform: scale(1.1); }
 
+/* ** THE FIX: Media Query for mobile screen overlap ** */
+@media (max-width: 600px) {
+    #network-controls {
+        bottom: auto;
+        top: 2rem;
+    }
+}
+
+
 /* Modal Styles */
-#modal-backdrop, #info-modal-backdrop {
+#modal-backdrop, #info-modal-backdrop, #guide-modal-backdrop {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(10px); z-index: 200;
@@ -186,64 +157,35 @@ body {
 .nav-btn { padding: 0.75rem 1.5rem; background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; color: var(--gold); font-weight: 600; cursor: pointer; transition: all 0.2s ease; font-size: 1rem; }
 .nav-btn:hover:not(:disabled) { background: rgba(212, 175, 55, 0.2); transform: translateY(-2px); }
 .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-.modal-footer-note {
-    width: 100%;
-    text-align: center;
-    font-size: 0.8rem;
-    color: var(--text-light);
-    margin-top: 0.5rem;
-}
-
-#speaker-btn {
-    position: absolute; top: 1rem; left: 1rem;
-    width: 36px; height: 36px;
-    background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3);
-    border-radius: 50%; color: var(--gold); font-size: 1.2rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s ease;
-}
+.modal-footer-note { width: 100%; text-align: center; font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem; }
+#speaker-btn { position: absolute; top: 1rem; left: 1rem; width: 36px; height: 36px; background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 50%; color: var(--gold); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
 #speaker-btn:hover { background: rgba(212, 175, 55, 0.2); transform: scale(1.1); }
 
-/* Info Modal Content */
+/* Info & Guide Modal Content */
 .info-header { color: var(--gold); text-align: center; margin-bottom: 1.5rem; font-size: 1.25rem; }
 #info-modal-backdrop ul { list-style: none; padding-left: 1rem; margin-bottom: 2rem; }
 #info-modal-backdrop li { margin-bottom: 1rem; line-height: 1.6; padding-left: 1.2rem; position: relative; }
 #info-modal-backdrop li::before { content: '•'; color: var(--gold); font-weight: bold; position: absolute; left: 0; }
 .info-footer { text-align: center; color: var(--text-light); font-style: italic; }
 
-.toast-notification {
-    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
-    background-color: rgba(10, 14, 39, 0.9);
-    backdrop-filter: blur(10px); color: var(--gold);
-    padding: 1rem 1.5rem; border-radius: 12px;
-    border: 1px solid var(--border-color); z-index: 1000;
-    opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease;
-    pointer-events: none; font-size: 0.9rem;
-}
+.guide-step { display: none; }
+.guide-step.active { display: block; animation: fadeIn 0.5s; }
+.guide-text { text-align: center; line-height: 1.7; font-size: 1.1rem; color: var(--text-light); }
+#guide-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; }
+.guide-nav-btn { background: none; border: none; color: var(--gold); cursor: pointer; font-size: 1rem; padding: 0.5rem 1rem; border-radius: 8px; transition: background-color 0.2s; }
+.guide-nav-btn:hover { background-color: rgba(212, 175, 55, 0.1); }
+#guide-step-counter { color: var(--text-light); font-size: 0.9rem; }
+
+.toast-notification { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background-color: rgba(10, 14, 39, 0.9); backdrop-filter: blur(10px); color: var(--gold); padding: 1rem 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); z-index: 1000; opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none; font-size: 0.9rem; }
 .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(-20px); }
 
 /* SVG Styles */
-.central-media-container { pointer-events: none; }
-/* ** THE FIX: CSS rule to make the media content circular ** */
-.central-media-content {
-    width:100%;
-    height:100%;
-    object-fit: cover;
-    border-radius: 50%; /* This is the key change */
-}
-.mandala-circle {
-    stroke: var(--gold); stroke-width: 0.5px;
-    fill: white; transition: transform 0.3s ease; cursor: pointer;
-}
+.central-media-content { width:100%; height:100%; object-fit: cover; border-radius: 50%; }
+.mandala-circle { stroke: var(--gold); stroke-width: 0.5px; fill: white; transition: transform 0.3s ease; cursor: pointer; }
 .mandala-group:hover .mandala-circle { transform: scale(1.05); }
 .verse-dot { fill: var(--dark-blue); cursor: pointer; }
 
-#loading, #error {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: var(--dark-blue);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    z-index: 300; padding: 2rem; text-align: center;
-}
+#loading, #error { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--dark-blue); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 300; padding: 2rem; text-align: center; }
 #loading-spinner { font-size: 4rem; animation: spin 2s linear infinite; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 #loading-text { margin-top: 1rem; font-size: 1.25rem; color: var(--gold); }

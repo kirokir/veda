@@ -12,7 +12,7 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+Devanagari:wght@400;600&display.swap" rel="stylesheet">
 </head>
 <body>
@@ -25,16 +25,12 @@
     <div id="top-right-controls">
         <a id="developer-link" href="https://dear.is-a.dev/" target="_blank" rel="noopener noreferrer">Visit Developer</a>
         <button id="info-btn" title="Note from Developer">i</button>
+        <!-- NEW Guide Button -->
+        <button id="guide-btn" title="How to Use">?</button>
     </div>
 
+    <!-- Minimal Header for the button -->
     <div id="header">
-        <h1 id="title">Veda One</h1>
-        <!-- UPDATED SUBTITLE -->
-        <p id="subtitle">
-            10,552 Verses from the 10 mandalas of the Rigveda.<br>
-            what you see is the rig veda with each circle being a mandal and each dot being a verse.<br>
-            press button below or zoom in to any random dot- to know your message for the day from the eternal text
-        </p>
         <button id="random-verse-btn">🌠 See what the Veda has to say to you</button>
     </div>
 
@@ -78,6 +74,35 @@
                 <li>Translation for some verses has been skipped due to the unavailability of copyright-free material.</li>
             </ul>
             <p class="info-footer">Wishing you all the best in reviving the culture.</p>
+        </div>
+    </div>
+    
+    <!-- NEW: Guide Modal -->
+    <div id="guide-modal-backdrop">
+        <div id="modal">
+            <div id="guide-steps-container">
+                <div class="guide-step">
+                    <h2 class="info-header">🌕 Rigveda — 10,552 Verses of Eternal Wisdom</h2>
+                    <p class="guide-text">Each circle represents a Mandal, and every dot within it a verse — a spark of divine knowledge.</p>
+                </div>
+                <div class="guide-step">
+                    <h2 class="info-header">🔍 Explore</h2>
+                    <p class="guide-text">Zoom in on any Mandal to wander through its sacred verses, or tap any dot to receive your message of the day from the eternal Rigveda.</p>
+                </div>
+                <div class="guide-step">
+                    <h2 class="info-header">✨ Let Destiny Guide You</h2>
+                    <p class="guide-text">Let destiny guide your touch — each verse reveals a timeless truth meant for you.</p>
+                </div>
+            </div>
+            <div id="guide-nav">
+                <button class="guide-nav-btn" id="guide-skip-btn">Skip</button>
+                <div id="guide-step-counter">1 / 3</div>
+                <div>
+                    <button class="guide-nav-btn" id="guide-back-btn">Back</button>
+                    <button class="guide-nav-btn" id="guide-next-btn">Next</button>
+                    <button class="guide-nav-btn" id="guide-close-btn">Close</button>
+                </div>
+            </div>
         </div>
     </div>
 

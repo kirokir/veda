@@ -53,6 +53,11 @@ async function init() {
         initializeVisualization();
         setupEventListeners();
 
+        // ** NEW: Check if the guide has been shown before **
+        if (!localStorage.getItem('vedaOneGuideCompleted')) {
+            openGuideModal();
+        }
+
         document.getElementById('loading').style.display = 'none';
     } catch (error) {
         console.error('Initialization Error:', error);
@@ -100,14 +105,9 @@ function initializeVisualization() {
     const vizCenterY = headerHeight + (availableHeight / 2);
     const vizCenterX = width / 2;
 
-    // ** THE FIX: Increased central radius for a bigger center element **
     const centralRadius = 125;
-
-    g.append('circle')
-        .attr('r', centralRadius)
-        .attr('fill', 'var(--gold)');
+    g.append('circle').attr('r', centralRadius).attr('fill', 'var(--gold)');
     
-    // The <foreignObject> remains the same, but the CSS will now make its content circular
     const foreignObject = g.append('foreignObject')
         .attr('width', centralRadius * 2)
         .attr('height', centralRadius * 2)
@@ -120,15 +120,11 @@ function initializeVisualization() {
         foreignObject.html(`<img src="${config.mediaURL}" class="central-media-content">`);
     }
 
-    const mandalaGroups = g.selectAll('.mandala-group')
-        .data(mandalas)
-        .join('g')
+    const mandalaGroups = g.selectAll('.mandala-group').data(mandalas).join('g')
         .attr('class', 'mandala-group')
         .attr('transform', d => `translate(${d.x}, ${d.y})`);
 
-    mandalaGroups.append('circle')
-        .attr('class', 'mandala-circle')
-        .attr('r', 85)
+    mandalaGroups.append('circle').attr('class', 'mandala-circle').attr('r', 85)
         .on('click', (event, d) => {
             playSound('zoom');
             event.stopPropagation();
@@ -136,13 +132,9 @@ function initializeVisualization() {
         });
 
     mandalaGroups.each(function(mandalaData) {
-        d3.select(this).selectAll('.verse-dot')
-            .data(mandalaData.verses)
-            .join('circle')
+        d3.select(this).selectAll('.verse-dot').data(mandalaData.verses).join('circle')
             .attr('class', 'verse-dot')
-            .attr('cx', d => d.x)
-            .attr('cy', d => d.y)
-            .attr('r', 1)
+            .attr('cx', d => d.x).attr('cy', d => d.y).attr('r', 1)
             .on('click', (event, d) => {
                 playSound('open');
                 event.stopPropagation();
@@ -158,8 +150,7 @@ function initializeVisualization() {
     
     initialTransform = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
 
-    zoom = d3.zoom()
-        .scaleExtent([initialTransform.k, initialTransform.k * 50])
+    zoom = d3.zoom().scaleExtent([initialTransform.k, initialTransform.k * 50])
         .on('zoom', (event) => g.attr('transform', event.transform));
     
     svg.call(zoom).call(zoom.transform, initialTransform);
@@ -201,14 +192,9 @@ function zoomToVerse(verseIndex) {
     const targetX = mandala.x + verse.x;
     const targetY = mandala.y + verse.y;
     
-    const transform = d3.zoomIdentity
-      .translate(vizCenterX, vizCenterY)
-      .scale(scale)
-      .translate(-targetX, -targetY);
+    const transform = d3.zoomIdentity.translate(vizCenterX, vizCenterY).scale(scale).translate(-targetX, -targetY);
     
-    svg.transition()
-        .duration(2000)
-        .call(zoom.transform, transform)
+    svg.transition().duration(2000).call(zoom.transform, transform)
         .on('end', () => openVerseModal(verseIndex));
 }
 
@@ -269,14 +255,43 @@ function showToast(message) {
 }
 
 // ===================================================================
+// NEW: GUIDE MODAL LOGIC
+// ===================================================================
+let currentGuideStep = 0;
+const guideSteps = document.querySelectorAll('.guide-step');
+const totalGuideSteps = guideSteps.length;
+
+function showGuideStep(stepIndex) {
+    guideSteps.forEach((step, index) => {
+        step.classList.toggle('active', index === stepIndex);
+    });
+
+    document.getElementById('guide-step-counter').textContent = `${stepIndex + 1} / ${totalGuideSteps}`;
+    document.getElementById('guide-back-btn').style.display = stepIndex > 0 ? 'inline-block' : 'none';
+    document.getElementById('guide-next-btn').style.display = stepIndex < totalGuideSteps - 1 ? 'inline-block' : 'none';
+    document.getElementById('guide-close-btn').style.display = stepIndex === totalGuideSteps - 1 ? 'inline-block' : 'none';
+    document.getElementById('guide-skip-btn').style.display = stepIndex < totalGuideSteps - 1 ? 'inline-block' : 'none';
+}
+
+function openGuideModal() {
+    playSound('open');
+    currentGuideStep = 0;
+    showGuideStep(currentGuideStep);
+    document.getElementById('guide-modal-backdrop').style.display = 'flex';
+}
+
+function closeGuideModal() {
+    playSound('close');
+    document.getElementById('guide-modal-backdrop').style.display = 'none';
+    localStorage.setItem('vedaOneGuideCompleted', 'true');
+}
+
+
+// ===================================================================
 // EVENT LISTENERS
 // ===================================================================
 function setupEventListeners() {
-    document.getElementById('random-verse-btn').addEventListener('click', () => {
-        playSound('zoom');
-        navigateToRandom();
-    });
-
+    document.getElementById('random-verse-btn').addEventListener('click', () => { playSound('zoom'); navigateToRandom(); });
     document.getElementById('zoom-in').addEventListener('click', () => { playSound('click'); svg.transition().duration(300).call(zoom.scaleBy, 1.5); });
     document.getElementById('zoom-out').addEventListener('click', () => { playSound('click'); svg.transition().duration(300).call(zoom.scaleBy, 0.7); });
     document.getElementById('reset-view').addEventListener('click', () => { playSound('zoom'); svg.transition().duration(750).call(zoom.transform, initialTransform); });
@@ -286,36 +301,25 @@ function setupEventListeners() {
     document.getElementById('prev-btn').addEventListener('click', () => navigateTo(-1));
     document.getElementById('next-btn').addEventListener('click', () => navigateTo(1));
     document.getElementById('random-btn').addEventListener('click', navigateToRandom);
-    document.getElementById('speaker-btn').addEventListener('click', () => {
-        playSound('click');
-        showToast('Audio will be added in version 2. Thank you for your patience.');
-    });
+    document.getElementById('speaker-btn').addEventListener('click', () => { playSound('click'); showToast('Audio will be added in version 2. Thank you for your patience.'); });
 
     const infoModal = document.getElementById('info-modal-backdrop');
-    document.getElementById('info-btn').addEventListener('click', () => {
-        playSound('open');
-        infoModal.style.display = 'flex';
-    });
-    infoModal.querySelector('.modal-close-btn').addEventListener('click', () => {
-        playSound('close');
-        infoModal.style.display = 'none';
-    });
-    infoModal.addEventListener('click', (e) => {
-        if (e.target.id === 'info-modal-backdrop') {
-            playSound('close');
-            infoModal.style.display = 'none';
-        }
-    });
+    document.getElementById('info-btn').addEventListener('click', () => { playSound('open'); infoModal.style.display = 'flex'; });
+    infoModal.querySelector('.modal-close-btn').addEventListener('click', () => { playSound('close'); infoModal.style.display = 'none'; });
+    infoModal.addEventListener('click', (e) => { if (e.target.id === 'info-modal-backdrop') { playSound('close'); infoModal.style.display = 'none'; } });
+
+    // NEW: Guide event listeners
+    document.getElementById('guide-btn').addEventListener('click', openGuideModal);
+    document.getElementById('guide-next-btn').addEventListener('click', () => { playSound('click'); showGuideStep(++currentGuideStep); });
+    document.getElementById('guide-back-btn').addEventListener('click', () => { playSound('click'); showGuideStep(--currentGuideStep); });
+    document.getElementById('guide-skip-btn').addEventListener('click', closeGuideModal);
+    document.getElementById('guide-close-btn').addEventListener('click', closeGuideModal);
 
     document.addEventListener('keydown', (e) => {
-        if (document.getElementById('modal-backdrop').style.display === 'flex') {
-            if (e.key === 'Escape') closeVerseModal();
-            else if (e.key === 'ArrowLeft') document.getElementById('prev-btn').click();
-            else if (e.key === 'ArrowRight') document.getElementById('next-btn').click();
-        }
-        if (document.getElementById('info-modal-backdrop').style.display === 'flex') {
-             if (e.key === 'Escape') infoModal.style.display = 'none';
-        }
+        if (e.key !== 'Escape') return;
+        if (document.getElementById('modal-backdrop').style.display === 'flex') closeVerseModal();
+        if (document.getElementById('info-modal-backdrop').style.display === 'flex') { playSound('close'); infoModal.style.display = 'none'; }
+        if (document.getElementById('guide-modal-backdrop').style.display === 'flex') closeGuideModal();
     });
 
     window.addEventListener('resize', () => {
