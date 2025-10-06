@@ -63,6 +63,7 @@ function initializeVisualization() {
     const width = container.clientWidth;
     const height = container.clientHeight;
 
+    // This re-selects the SVG, which is important after a resize clear
     svg = d3.select('#network-svg').attr('width', width).attr('height', height);
     g = svg.append('g');
     
@@ -128,7 +129,7 @@ function zoomToMandala(mandalaData) {
     
     svg.transition().duration(1000).call(zoom.transform, transform);
 }
-
+        
 function zoomToVerse(verseIndex) {
     const verse = verses[verseIndex];
     const mandala = mandalas.find(m => m.mandalaNum === verse.mandala);
@@ -214,11 +215,18 @@ function setupEventListeners() {
         }
     });
 
+    // ===================================================================
+    // THE FIX IS HERE
+    // ===================================================================
     window.addEventListener('resize', () => {
-        const container = document.getElementById('viz-container');
-        svg.attr('width', container.clientWidth).attr('height', container.clientHeight);
+        // **THE FIX:** First, completely clear the SVG of all old elements.
+        d3.select('#network-svg').html('');
+        
+        // Now, re-run the entire initialization function.
+        // This will redraw everything correctly based on the new window size.
         initializeVisualization();
     });
+    // ===================================================================
 }
-
+        
 init();
