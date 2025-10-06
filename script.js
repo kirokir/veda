@@ -1,20 +1,3 @@
-// ===================================================================
-// AUDIO SYSTEM
-// ===================================================================
-// ** THE FIX: Replaced broken Base64 data with new, permanent, and reliable CDN links **
-const sounds = {
-    click: new Audio('https://cdn.jsdelivr.net/gh/KenneyNL/Interface-Sounds/Audio/click_002.ogg'),
-    zoom: new Audio('https://cdn.jsdelivr.net/gh/KenneyNL/Interface-Sounds/Audio/swoosh_01.ogg'),
-    open: new Audio('https://cdn.jsdelivr.net/gh/KenneyNL/Interface-Sounds/Audio/confirmation_001.ogg'),
-    close: new Audio('https://cdn.jsdelivr.net/gh/KenneyNL/Interface-Sounds/Audio/back_001.ogg')
-};
-
-function playSound(sound) {
-    if (sounds[sound]) {
-        sounds[sound].currentTime = 0;
-        sounds[sound].play().catch(e => console.error("Audio play failed:", e));
-    }
-}
 
 // ===================================================================
 // GLOBAL VARIABLES
@@ -32,54 +15,36 @@ let config = {};
 async function init() {
     try {
         const minimumWait = new Promise(resolve => setTimeout(resolve, 2000));
-
         const dataLoadingPromise = (async () => {
             const configResponse = await fetch('./config.json');
             if (!configResponse.ok) throw new Error('config.json not found or could not be loaded.');
             config = await configResponse.json();
-
             const loadingMediaContainer = document.getElementById('loading-media-container');
             if (loadingMediaContainer) {
                 let mediaElement;
                 if (config.mediaType === 'video') {
                     mediaElement = document.createElement('video');
                     mediaElement.autoplay = true; mediaElement.loop = true; mediaElement.muted = true; mediaElement.playsInline = true;
-                } else {
-                    mediaElement = document.createElement('img');
-                }
+                } else { mediaElement = document.createElement('img'); }
                 mediaElement.src = config.mediaURL;
                 mediaElement.className = 'loading-media-content';
                 loadingMediaContainer.appendChild(mediaElement);
             }
-
             if (typeof d3 === 'undefined') throw new Error('D3.js failed to load.');
             const response = await fetch('./rigveda_data_augmented.json');
             if (!response.ok) throw new Error(`Failed to load data: ${response.status}`);
-            
             const data = await response.json();
             if (!Array.isArray(data)) throw new Error('Data must be an array');
-
             verses = data.map((d, i) => ({...d, originalIndex: i}));
-            
             const groupedByMandala = d3.group(verses, d => d.mandala);
-            mandalas = Array.from(groupedByMandala, ([mandalaNum, versesInMandala]) => ({
-                mandalaNum,
-                verses: versesInMandala
-            }));
+            mandalas = Array.from(groupedByMandala, ([mandalaNum, versesInMandala]) => ({ mandalaNum, verses: versesInMandala }));
         })();
-
         await Promise.all([dataLoadingPromise, minimumWait]);
-
         calculatePositions();
         initializeVisualization();
         setupEventListeners();
-
         document.getElementById('loading').style.display = 'none';
-        
-        if (!localStorage.getItem('vedaOneGuideCompleted')) {
-            openGuideModal();
-        }
-
+        if (!localStorage.getItem('vedaOneGuideCompleted')) { openGuideModal(); }
     } catch (error) {
         console.error('Initialization Error:', error);
         const errDiv = document.getElementById('error');
@@ -92,17 +57,15 @@ async function init() {
 
 function calculatePositions() {
     const numMandalas = mandalas.length;
-    const mainRadius = 300;
-    const mandalaRadius = 85;
-
+    // ** THE FIX: Adjusted radii to make center bigger and nearly touch **
+    const mainRadius = 320; 
+    const mandalaRadius = 85; 
     mandalas.forEach((mandala, i) => {
         const angle = (i / numMandalas) * 2 * Math.PI;
         mandala.x = mainRadius * Math.cos(angle);
         mandala.y = mainRadius * Math.sin(angle);
-        
         const numVerses = mandala.verses.length;
         const goldenAngle = Math.PI * (3 - Math.sqrt(5));
-        
         mandala.verses.forEach((verse, j) => {
             const r = Math.sqrt(j / numVerses) * mandalaRadius * 0.95;
             const theta = j * goldenAngle;
@@ -116,7 +79,6 @@ function initializeVisualization() {
     const container = document.getElementById('viz-container');
     const width = container.clientWidth;
     const height = container.clientHeight;
-
     svg = d3.select('#network-svg').attr('width', width).attr('height', height);
     g = svg.append('g');
 
@@ -126,54 +88,43 @@ function initializeVisualization() {
     const vizCenterY = headerBottom + (availableHeight / 2);
     const vizCenterX = width / 2;
 
-    const centralRadius = 150; 
+    // ** THE FIX: Increased central radius **
+    const centralRadius = 220;
     g.append('circle').attr('r', centralRadius).attr('fill', 'var(--gold)');
-    
     const foreignObject = g.append('foreignObject')
         .attr('width', centralRadius * 2)
         .attr('height', centralRadius * 2)
         .attr('x', -centralRadius)
         .attr('y', -centralRadius);
-
     if (config.mediaType === 'video') {
         foreignObject.html(`<video src="${config.mediaURL}" class="central-media-content" autoplay loop muted playsinline></video>`);
     } else {
         foreignObject.html(`<img src="${config.mediaURL}" class="central-media-content">`);
     }
-
     const mandalaGroups = g.selectAll('.mandala-group').data(mandalas).join('g')
         .attr('class', 'mandala-group')
         .attr('transform', d => `translate(${d.x}, ${d.y})`);
-
     mandalaGroups.append('circle').attr('class', 'mandala-circle').attr('r', 85)
         .on('click', (event, d) => {
-            playSound('zoom');
             event.stopPropagation();
             zoomToMandala(d);
         });
-
     mandalaGroups.each(function(mandalaData) {
         d3.select(this).selectAll('.verse-dot').data(mandalaData.verses).join('circle')
             .attr('class', 'verse-dot')
             .attr('cx', d => d.x).attr('cy', d => d.y).attr('r', 1)
             .on('click', (event, d) => {
-                playSound('open');
                 event.stopPropagation();
                 openVerseModal(d.originalIndex);
             });
     });
-
     const bounds = g.node().getBBox();
     const scale = Math.min(width / bounds.width, availableHeight / bounds.height) * 0.85;
-    
     const translateX = vizCenterX - (bounds.x + bounds.width / 2) * scale;
     const translateY = vizCenterY - (bounds.y + bounds.height / 2) * scale;
-    
     initialTransform = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
-
     zoom = d3.zoom().scaleExtent([initialTransform.k, initialTransform.k * 50])
         .on('zoom', (event) => g.attr('transform', event.transform));
-    
     svg.call(zoom).call(zoom.transform, initialTransform);
 }
 
@@ -233,12 +184,10 @@ function openVerseModal(vIndex) {
 }
 
 function closeVerseModal() {
-    playSound('close');
     document.getElementById('modal-backdrop').style.display = 'none';
 }
 
 function navigateTo(direction) {
-    playSound('click');
     const sortedIndex = verses.findIndex(v => v.originalIndex === currentVerseIndex);
     const nextIndex = sortedIndex + direction;
     if (nextIndex >= 0 && nextIndex < verses.length) {
@@ -247,7 +196,6 @@ function navigateTo(direction) {
 }
 
 function navigateToRandom() {
-    playSound('zoom');
     closeVerseModal();
     const randomIndex = Math.floor(Math.random() * verses.length);
     zoomToVerse(randomIndex);
@@ -284,14 +232,12 @@ function showGuideStep(stepIndex) {
 }
 
 function openGuideModal() {
-    playSound('open');
     currentGuideStep = 0;
     showGuideStep(currentGuideStep);
     document.getElementById('guide-modal-backdrop').style.display = 'flex';
 }
 
 function closeGuideModal() {
-    playSound('close');
     document.getElementById('guide-modal-backdrop').style.display = 'none';
     localStorage.setItem('vedaOneGuideCompleted', 'true');
 }
@@ -301,29 +247,29 @@ function closeGuideModal() {
 // ===================================================================
 function setupEventListeners() {
     setupGuide();
-    document.getElementById('random-verse-btn').addEventListener('click', () => { playSound('zoom'); navigateToRandom(); });
-    document.getElementById('zoom-in').addEventListener('click', () => { playSound('click'); svg.transition().duration(300).call(zoom.scaleBy, 1.5); });
-    document.getElementById('zoom-out').addEventListener('click', () => { playSound('click'); svg.transition().duration(300).call(zoom.scaleBy, 0.7); });
-    document.getElementById('reset-view').addEventListener('click', () => { playSound('zoom'); svg.transition().duration(750).call(zoom.transform, initialTransform); });
+    document.getElementById('random-verse-btn').addEventListener('click', navigateToRandom);
+    document.getElementById('zoom-in').addEventListener('click', () => svg.transition().duration(300).call(zoom.scaleBy, 1.5));
+    document.getElementById('zoom-out').addEventListener('click', () => svg.transition().duration(300).call(zoom.scaleBy, 0.7));
+    document.getElementById('reset-view').addEventListener('click', () => svg.transition().duration(750).call(zoom.transform, initialTransform));
     document.querySelector('#modal-backdrop .modal-close-btn').addEventListener('click', closeVerseModal);
     document.getElementById('modal-backdrop').addEventListener('click', (e) => { if (e.target.id === 'modal-backdrop') closeVerseModal(); });
     document.getElementById('prev-btn').addEventListener('click', () => navigateTo(-1));
     document.getElementById('next-btn').addEventListener('click', () => navigateTo(1));
     document.getElementById('random-btn').addEventListener('click', navigateToRandom);
-    document.getElementById('speaker-btn').addEventListener('click', () => { playSound('click'); showToast('Audio will be added in version 2. Thank you for your patience.'); });
+    document.getElementById('speaker-btn').addEventListener('click', () => { showToast('Audio will be added in version 2. Thank you for your patience.'); });
     const infoModal = document.getElementById('info-modal-backdrop');
-    document.getElementById('info-btn').addEventListener('click', () => { playSound('open'); infoModal.style.display = 'flex'; });
-    infoModal.querySelector('.modal-close-btn').addEventListener('click', () => { playSound('close'); infoModal.style.display = 'none'; });
-    infoModal.addEventListener('click', (e) => { if (e.target.id === 'info-modal-backdrop') { playSound('close'); infoModal.style.display = 'none'; } });
+    document.getElementById('info-btn').addEventListener('click', () => { infoModal.style.display = 'flex'; });
+    infoModal.querySelector('.modal-close-btn').addEventListener('click', () => { infoModal.style.display = 'none'; });
+    infoModal.addEventListener('click', (e) => { if (e.target.id === 'info-modal-backdrop') { infoModal.style.display = 'none'; } });
     document.getElementById('guide-btn').addEventListener('click', openGuideModal);
-    document.getElementById('guide-next-btn').addEventListener('click', () => { playSound('click'); showGuideStep(++currentGuideStep); });
-    document.getElementById('guide-back-btn').addEventListener('click', () => { playSound('click'); showGuideStep(--currentGuideStep); });
+    document.getElementById('guide-next-btn').addEventListener('click', () => showGuideStep(++currentGuideStep));
+    document.getElementById('guide-back-btn').addEventListener('click', () => showGuideStep(--currentGuideStep));
     document.getElementById('guide-skip-btn').addEventListener('click', closeGuideModal);
     document.getElementById('guide-close-btn').addEventListener('click', closeGuideModal);
     document.addEventListener('keydown', (e) => {
         if (e.key !== 'Escape') return;
         if (document.getElementById('modal-backdrop').style.display === 'flex') closeVerseModal();
-        if (document.getElementById('info-modal-backdrop').style.display === 'flex') { playSound('close'); infoModal.style.display = 'none'; }
+        if (document.getElementById('info-modal-backdrop').style.display === 'flex') { infoModal.style.display = 'none'; }
         if (document.getElementById('guide-modal-backdrop').style.display === 'flex') closeGuideModal();
     });
     window.addEventListener('resize', () => {

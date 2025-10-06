@@ -1,6 +1,6 @@
 :root {
     --gold: #D4AF37;
-    --dark-blue: #0A0E27;
+    --dark-blue: #0A0A0A; 
     --text-light: rgba(255, 255, 255, 0.8);
     --border-color: rgba(212, 175, 55, 0.2);
 }
@@ -8,12 +8,17 @@
 html { font-size: 16px; }
 body {
     font-family: 'Inter', sans-serif;
-    background: var(--dark-blue);
     color: #fff;
     overflow: hidden;
     height: 100vh;
     width: 100vw;
     position: relative;
+    /* ** THE FIX: Background is now an image ** */
+    background-color: var(--dark-blue); /* Fallback color */
+    background-image: url('img/background.webp'); /* Assumes your image is here */
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 #top-right-controls {
@@ -28,17 +33,18 @@ body {
 }
 
 #developer-link, #info-btn, #guide-btn {
+    background: rgba(30, 30, 30, 0.5);
     backdrop-filter: blur(5px);
     transition: all 0.3s ease;
 }
 
 #developer-link {
-    background: rgba(255, 255, 255, 0.1);
     color: var(--text-light);
     padding: 0.4rem 0.8rem;
     border-radius: 20px;
     font-size: 0.75rem;
     text-decoration: none;
+    border: 1px solid var(--border-color);
 }
 #developer-link:hover { background: rgba(212, 175, 55, 0.2); color: var(--gold); }
 
@@ -46,7 +52,6 @@ body {
     width: 28px; height: 28px;
     border-radius: 50%;
     border: 1px solid var(--border-color);
-    background: rgba(255, 255, 255, 0.1);
     color: var(--text-light);
     cursor: pointer;
 }
@@ -123,11 +128,11 @@ body {
 #viz-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; cursor: grab; }
 #viz-container:active { cursor: grabbing; }
 
-/* ** THE FIX: Moved controls to top left ** */
+/* ** THE FIX: Controls moved to top left ** */
 #network-controls {
     position: fixed;
-    top: 1.5rem;   /* Changed from bottom */
-    left: 1.5rem;  /* Changed from right */
+    top: 1.5rem;
+    left: 1.5rem;
     z-index: 90;
     display: flex;
     flex-direction: column;
@@ -135,7 +140,7 @@ body {
 }
 .control-btn {
     width: 44px; height: 44px;
-    background: rgba(10, 14, 39, 0.8);
+    background: rgba(20, 20, 20, 0.8);
     backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
     border-radius: 50%; color: var(--gold);
@@ -145,14 +150,9 @@ body {
 }
 .control-btn:hover { background: rgba(212, 175, 55, 0.2); transform: scale(1.1); }
 
-/* ** THE FIX: Removed the media query that was moving the controls on mobile ** */
-@media (max-width: 600px) {
-    /* The #network-controls rule was removed from here */
-}
-
 /* Modal Styles */
-#modal-backdrop, #info-modal-backdrop, #guide-modal-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1rem; animation: fadeIn 0.3s ease; }
-#modal { background: linear-gradient(135deg, rgba(10, 14, 39, 0.95) 0%, rgba(26, 31, 58, 0.95) 100%); border: 2px solid rgba(212, 175, 55, 0.3); border-radius: 20px; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
+#modal-backdrop, #info-modal-backdrop, #guide-modal-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1rem; animation: fadeIn 0.3s ease; }
+#modal { background: #111; border: 1px solid var(--border-color); border-radius: 20px; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
 .modal-close-btn { position: absolute; top: 1rem; right: 1rem; width: 36px; height: 36px; background: rgba(212, 175, 55, 0.1); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 50%; color: var(--gold); font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
 .modal-close-btn:hover { background: rgba(212, 175, 55, 0.2); transform: rotate(90deg); }
 #modal-header { font-size: 1.25rem; font-weight: 600; color: var(--gold); margin-bottom: 1.5rem; text-align: center; }
@@ -188,8 +188,9 @@ body {
 .mandala-group:hover .mandala-circle { transform: scale(1.05); }
 .verse-dot { fill: var(--dark-blue); cursor: pointer; }
 #loading, #error { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--dark-blue); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 300; padding: 2rem; text-align: center; }
-#loading-media-container { width: 150px; height: 150px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 30px rgba(212, 175, 55, 0.5); animation: pulse 2.5s infinite ease-in-out; }
+/* ** THE FIX: Matched loading circle size to main circle size ** */
+#loading-media-container { width: 220px; height: 220px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 30px rgba(212, 175, 55, 0.5); animation: pulse 2.5s infinite ease-in-out; }
 .loading-media-content { width: 100%; height: 100%; object-fit: cover; }
-@keyframes pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(212, 175, 55, 0.5); } 50% { transform: scale(1.05); box-shadow: 0 0 45px rgba(212, 175, 55, 0.7); } }
+@keyframes pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(212, 175, 55, .5); } 50% { transform: scale(1.05); box-shadow: 0 0 45px rgba(212, 175, 55, 0.7); } }
 #loading-text { margin-top: 1.5rem; font-size: 1.25rem; color: var(--gold); }
 #error-message { font-size: 1.5rem; color: var(--gold); max-width: 800px; }
