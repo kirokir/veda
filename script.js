@@ -1,9 +1,32 @@
+// ===================================================================
+// AUDIO SYSTEM
+// ===================================================================
+const sounds = {
+    click: new Audio('https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-the-sound-pack-tree/tspt_multimedia_button_clickable_025.mp3'),
+    zoom: new Audio('https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-the-sound-pack-tree/tspt_multimedia_swoosh_generic_001.mp3'),
+    open: new Audio('https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-the-sound-pack-tree/tspt_multimedia_button_generic_002.mp3'),
+    close: new Audio('https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-the-sound-pack-tree/tspt_multimedia_button_generic_004.mp3')
+};
+
+function playSound(sound) {
+    if (sounds[sound]) {
+        sounds[sound].currentTime = 0; // Rewind to the start
+        sounds[sound].play();
+    }
+}
+
+// ===================================================================
+// GLOBAL VARIABLES
+// ===================================================================
 let verses = [];
 let mandalas = [];
 let svg, g, zoom;
 let currentVerseIndex = -1;
 let initialTransform;
 
+// ===================================================================
+// INITIALIZATION
+// ===================================================================
 async function init() {
     try {
         if (typeof d3 === 'undefined') throw new Error('D3.js failed to load.');
@@ -38,9 +61,8 @@ async function init() {
 
 function calculatePositions() {
     const numMandalas = mandalas.length;
-    // ** THE FIX: Adjusted radii for new layout **
-    const mainRadius = 300;     // Distance of Mandalas from center
-    const mandalaRadius = 85;   // Size of the Mandala circles
+    const mainRadius = 300;
+    const mandalaRadius = 85;
 
     mandalas.forEach((mandala, i) => {
         const angle = (i / numMandalas) * 2 * Math.PI;
@@ -51,7 +73,7 @@ function calculatePositions() {
         const goldenAngle = Math.PI * (3 - Math.sqrt(5));
         
         mandala.verses.forEach((verse, j) => {
-            const r = Math.sqrt(j / numVerses) * mandalaRadius * 0.95; // 95% to keep dots inside
+            const r = Math.sqrt(j / numVerses) * mandalaRadius * 0.95;
             const theta = j * goldenAngle;
             verse.x = r * Math.cos(theta);
             verse.y = r * Math.sin(theta);
@@ -67,18 +89,19 @@ function initializeVisualization() {
     svg = d3.select('#network-svg').attr('width', width).attr('height', height);
     g = svg.append('g');
     
-    // ** THE FIX: Central circle is now smaller **
     g.append('circle')
         .attr('r', 90)
         .attr('fill', 'var(--gold)');
     
-    // ** THE FIX: Replaced text emoji with an image element **
-    g.append('image')
-        .attr('href', 'https://api.iconify.design/twemoji/om.svg?color=%238a2be2') // You can replace this URL
-        .attr('width', 120)
-        .attr('height', 120)
-        .attr('x', -60) // Center horizontally (-width/2)
-        .attr('y', -60); // Center vertically (-height/2)
+    // ** THE FIX: Replaced Om text with a foreignObject to embed a GIF/Image **
+    const gifSize = 120;
+    g.append('foreignObject')
+        .attr('width', gifSize)
+        .attr('height', gifSize)
+        .attr('x', -gifSize / 2)
+        .attr('y', -gifSize / 2)
+        .attr('class', 'central-gif-container')
+        .html('<img src="https://i.pinimg.com/originals/78/3a/a5/783aa55364cfe3f2f67a256a47e53da9.gif" style="width:100%; height:100%; border-radius: 12px;">');
 
     const mandalaGroups = g.selectAll('.mandala-group')
         .data(mandalas)
@@ -86,11 +109,11 @@ function initializeVisualization() {
         .attr('class', 'mandala-group')
         .attr('transform', d => `translate(${d.x}, ${d.y})`);
 
-    // ** THE FIX: Mandala circles are now larger **
     mandalaGroups.append('circle')
         .attr('class', 'mandala-circle')
         .attr('r', 85)
         .on('click', (event, d) => {
+            playSound('zoom');
             event.stopPropagation();
             zoomToMandala(d);
         });
@@ -102,15 +125,16 @@ function initializeVisualization() {
             .attr('class', 'verse-dot')
             .attr('cx', d => d.x)
             .attr('cy', d => d.y)
-            .attr('r', 1) // Slightly larger dots for visibility
+            .attr('r', 1)
             .on('click', (event, d) => {
+                playSound('open');
                 event.stopPropagation();
                 openVerseModal(d.originalIndex);
             });
     });
 
     const bounds = g.node().getBBox();
-    const scale = Math.min(width / bounds.width, height / bounds.height) * 0.85; // Use 85% of screen
+    const scale = Math.min(width / bounds.width, height / bounds.height) * 0.85;
     const translateX = width / 2 - (bounds.x + bounds.width / 2) * scale;
     const translateY = height / 2 - (bounds.y + bounds.height / 2) * scale;
     
@@ -123,6 +147,9 @@ function initializeVisualization() {
     svg.call(zoom).call(zoom.transform, initialTransform);
 }
 
+// ===================================================================
+// NAVIGATION & INTERACTION
+// ===================================================================
 function zoomToMandala(mandalaData) {
     const width = svg.attr('width');
     const height = svg.attr('height');
@@ -184,10 +211,12 @@ function openVerseModal(vIndex) {
 }
 
 function closeVerseModal() {
+    playSound('close');
     document.getElementById('modal-backdrop').style.display = 'none';
 }
 
 function navigateTo(direction) {
+    playSound('click');
     const sortedIndex = verses.findIndex(v => v.originalIndex === currentVerseIndex);
     const nextIndex = sortedIndex + direction;
     if (nextIndex >= 0 && nextIndex < verses.length) {
@@ -196,22 +225,68 @@ function navigateTo(direction) {
 }
 
 function navigateToRandom() {
+    playSound('zoom');
     closeVerseModal();
     const randomIndex = Math.floor(Math.random() * verses.length);
     zoomToVerse(randomIndex);
 }
 
+// ** NEW: Toast notification function **
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    // Trigger fade in
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 100);
+
+    // Start fade out after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+
+    // Remove from DOM after transition
+    setTimeout(() => {
+        document.body.removeChild(toast);
+    }, 3500);
+}
+
+// ===================================================================
+// EVENT LISTENERS
+// ===================================================================
 function setupEventListeners() {
-    document.getElementById('random-verse-btn').addEventListener('click', navigateToRandom);
-    document.getElementById('zoom-in').addEventListener('click', () => svg.transition().duration(300).call(zoom.scaleBy, 1.5));
-    document.getElementById('zoom-out').addEventListener('click', () => svg.transition().duration(300).call(zoom.scaleBy, 0.7));
-    document.getElementById('reset-view').addEventListener('click', () => svg.transition().duration(750).call(zoom.transform, initialTransform));
+    document.getElementById('random-verse-btn').addEventListener('click', () => {
+        playSound('zoom');
+        navigateToRandom();
+    });
+
+    document.getElementById('zoom-in').addEventListener('click', () => {
+        playSound('click');
+        svg.transition().duration(300).call(zoom.scaleBy, 1.5);
+    });
+    document.getElementById('zoom-out').addEventListener('click', () => {
+        playSound('click');
+        svg.transition().duration(300).call(zoom.scaleBy, 0.7);
+    });
+    document.getElementById('reset-view').addEventListener('click', () => {
+        playSound('zoom');
+        svg.transition().duration(750).call(zoom.transform, initialTransform);
+    });
     
     document.getElementById('modal-close').addEventListener('click', closeVerseModal);
     document.getElementById('modal-backdrop').addEventListener('click', (e) => { if (e.target.id === 'modal-backdrop') closeVerseModal(); });
     document.getElementById('prev-btn').addEventListener('click', () => navigateTo(-1));
     document.getElementById('next-btn').addEventListener('click', () => navigateTo(1));
     document.getElementById('random-btn').addEventListener('click', navigateToRandom);
+
+    // ** NEW: Speaker button listener **
+    document.getElementById('speaker-btn').addEventListener('click', () => {
+        playSound('click');
+        showToast('Audio will be added in version 2. Thank you for your patience.');
+    });
 
     document.addEventListener('keydown', (e) => {
         if (document.getElementById('modal-backdrop').style.display === 'flex') {
