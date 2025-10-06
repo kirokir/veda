@@ -1,12 +1,12 @@
 // ===================================================================
 // AUDIO SYSTEM
 // ===================================================================
-// ** THE FIX: Replaced broken Zapsplat URLs with new, reliable Pixabay URLs **
+// ** THE FIX: Replaced broken Pixabay URLs with new, reliable jsdelivr CDN URLs **
 const sounds = {
-    click: new Audio('https://cdn.pixabay.com/download/audio/2022/03/15/audio_2c64960538.mp3'), // Short UI click
-    zoom: new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_c38927d26e.mp3'),  // Quick swoosh
-    open: new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_a16ffcf384.mp3'),   // Positive open/confirm
-    close: new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_9e31f08be2.mp3')   // Subtle close/cancel
+    click: new Audio('https://cdn.jsdelivr.net/gh/k-l-lambda/Front-end-Portfolio@8026105373305151525a401c37c22934685011a8/audio/click.mp3'),
+    zoom: new Audio('https://cdn.jsdelivr.net/gh/k-l-lambda/Front-end-Portfolio@8026105373305151525a401c37c22934685011a8/audio/swoosh.mp3'),
+    open: new Audio('https://cdn.jsdelivr.net/gh/k-l-lambda/Front-end-Portfolio@8026105373305151525a401c37c22934685011a8/audio/open.mp3'),
+    close: new Audio('https://cdn.jsdelivr.net/gh/k-l-lambda/Front-end-Portfolio@8026105373305151525a401c37c22934685011a8/audio/close.mp3')
 };
 
 function playSound(sound) {
@@ -31,51 +31,60 @@ let config = {};
 // ===================================================================
 async function init() {
     try {
-        const configResponse = await fetch('./config.json');
-        if (!configResponse.ok) throw new Error('config.json not found or could not be loaded.');
-        config = await configResponse.json();
+        // ** THE FIX: Start a minimum 2-second timer immediately **
+        const minimumWait = new Promise(resolve => setTimeout(resolve, 2000));
 
-        const loadingMediaContainer = document.getElementById('loading-media-container');
-        if (loadingMediaContainer) {
-            let mediaElement;
-            if (config.mediaType === 'video') {
-                mediaElement = document.createElement('video');
-                mediaElement.autoplay = true;
-                mediaElement.loop = true;
-                mediaElement.muted = true;
-                mediaElement.playsInline = true;
-            } else {
-                mediaElement = document.createElement('img');
+        // Start all data fetching operations concurrently
+        const dataLoadingPromise = (async () => {
+            const configResponse = await fetch('./config.json');
+            if (!configResponse.ok) throw new Error('config.json not found or could not be loaded.');
+            config = await configResponse.json();
+
+            const loadingMediaContainer = document.getElementById('loading-media-container');
+            if (loadingMediaContainer) {
+                let mediaElement;
+                if (config.mediaType === 'video') {
+                    mediaElement = document.createElement('video');
+                    mediaElement.autoplay = true; mediaElement.loop = true; mediaElement.muted = true; mediaElement.playsInline = true;
+                } else {
+                    mediaElement = document.createElement('img');
+                }
+                mediaElement.src = config.mediaURL;
+                mediaElement.className = 'loading-media-content';
+                loadingMediaContainer.appendChild(mediaElement);
             }
-            mediaElement.src = config.mediaURL;
-            mediaElement.className = 'loading-media-content';
-            loadingMediaContainer.appendChild(mediaElement);
-        }
 
-        if (typeof d3 === 'undefined') throw new Error('D3.js failed to load.');
-        const response = await fetch('./rigveda_data_augmented.json');
-        if (!response.ok) throw new Error(`Failed to load data: ${response.status}`);
-        
-        const data = await response.json();
-        if (!Array.isArray(data)) throw new Error('Data must be an array');
+            if (typeof d3 === 'undefined') throw new Error('D3.js failed to load.');
+            const response = await fetch('./rigveda_data_augmented.json');
+            if (!response.ok) throw new Error(`Failed to load data: ${response.status}`);
+            
+            const data = await response.json();
+            if (!Array.isArray(data)) throw new Error('Data must be an array');
 
-        verses = data.map((d, i) => ({...d, originalIndex: i}));
-        
-        const groupedByMandala = d3.group(verses, d => d.mandala);
-        mandalas = Array.from(groupedByMandala, ([mandalaNum, versesInMandala]) => ({
-            mandalaNum,
-            verses: versesInMandala
-        }));
+            verses = data.map((d, i) => ({...d, originalIndex: i}));
+            
+            const groupedByMandala = d3.group(verses, d => d.mandala);
+            mandalas = Array.from(groupedByMandala, ([mandalaNum, versesInMandala]) => ({
+                mandalaNum,
+                verses: versesInMandala
+            }));
+        })();
 
+        // ** THE FIX: Wait for BOTH the data to load AND the 2-second timer to finish **
+        await Promise.all([dataLoadingPromise, minimumWait]);
+
+        // Now that data is loaded and 2 seconds have passed, build the visualization
         calculatePositions();
         initializeVisualization();
         setupEventListeners();
 
+        // Finally, hide the loading screen and then show the guide if needed
+        document.getElementById('loading').style.display = 'none';
+        
         if (!localStorage.getItem('vedaOneGuideCompleted')) {
             openGuideModal();
         }
 
-        document.getElementById('loading').style.display = 'none';
     } catch (error) {
         console.error('Initialization Error:', error);
         const errDiv = document.getElementById('error');
