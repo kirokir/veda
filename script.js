@@ -1,6 +1,3 @@
-
-// ===================================================================
-// GLOBAL VARIABLES
 // ===================================================================
 let verses = [];
 let mandalas = [];
@@ -257,21 +254,45 @@ function setupEventListeners() {
     document.getElementById('next-btn').addEventListener('click', () => navigateTo(1));
     document.getElementById('random-btn').addEventListener('click', navigateToRandom);
     document.getElementById('speaker-btn').addEventListener('click', () => { showToast('Audio will be added in version 2. Thank you for your patience.'); });
+    
     const infoModal = document.getElementById('info-modal-backdrop');
     document.getElementById('info-btn').addEventListener('click', () => { infoModal.style.display = 'flex'; });
     infoModal.querySelector('.modal-close-btn').addEventListener('click', () => { infoModal.style.display = 'none'; });
     infoModal.addEventListener('click', (e) => { if (e.target.id === 'info-modal-backdrop') { infoModal.style.display = 'none'; } });
+
     document.getElementById('guide-btn').addEventListener('click', openGuideModal);
     document.getElementById('guide-next-btn').addEventListener('click', () => showGuideStep(++currentGuideStep));
     document.getElementById('guide-back-btn').addEventListener('click', () => showGuideStep(--currentGuideStep));
     document.getElementById('guide-skip-btn').addEventListener('click', closeGuideModal);
     document.getElementById('guide-close-btn').addEventListener('click', closeGuideModal);
+
+    // ** THE FIX: Hamburger Menu Logic **
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileInfoBtn = document.getElementById('mobile-info-btn');
+    const mobileGuideBtn = document.getElementById('mobile-guide-btn');
+
+    const toggleMobileMenu = () => {
+        mobileMenu.classList.toggle('active');
+    };
+    hamburgerBtn.addEventListener('click', toggleMobileMenu);
+    mobileInfoBtn.addEventListener('click', () => {
+        toggleMobileMenu();
+        infoModal.style.display = 'flex';
+    });
+    mobileGuideBtn.addEventListener('click', () => {
+        toggleMobileMenu();
+        openGuideModal();
+    });
+
     document.addEventListener('keydown', (e) => {
         if (e.key !== 'Escape') return;
         if (document.getElementById('modal-backdrop').style.display === 'flex') closeVerseModal();
         if (document.getElementById('info-modal-backdrop').style.display === 'flex') { infoModal.style.display = 'none'; }
         if (document.getElementById('guide-modal-backdrop').style.display === 'flex') closeGuideModal();
+        if (mobileMenu.classList.contains('active')) toggleMobileMenu(); // Close mobile menu with Escape
     });
+    
     window.addEventListener('resize', () => {
         d3.select('#network-svg').html('');
         initializeVisualization();
