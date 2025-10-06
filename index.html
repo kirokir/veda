@@ -17,7 +17,8 @@
 </head>
 <body>
     <div id="loading">
-        <div id="loading-spinner">🕉️</div>
+        <!-- UPDATED Loading Screen Structure -->
+        <div id="loading-media-container"></div>
         <div id="loading-text">Loading the cosmos...</div>
     </div>
     <div id="error" style="display: none;"><div id="error-message"></div></div>
@@ -25,11 +26,9 @@
     <div id="top-right-controls">
         <a id="developer-link" href="https://dear.is-a.dev/" target="_blank" rel="noopener noreferrer">Visit Developer</a>
         <button id="info-btn" title="Note from Developer">i</button>
-        <!-- NEW Guide Button -->
         <button id="guide-btn" title="How to Use">?</button>
     </div>
 
-    <!-- Minimal Header for the button -->
     <div id="header">
         <button id="random-verse-btn">🌠 See what the Veda has to say to you</button>
     </div>
@@ -77,7 +76,7 @@
         </div>
     </div>
     
-    <!-- NEW: Guide Modal -->
+    <!-- Guide Modal -->
     <div id="guide-modal-backdrop">
         <div id="modal">
             <div id="guide-steps-container">

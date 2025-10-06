@@ -114,14 +114,9 @@ body {
 }
 .control-btn:hover { background: rgba(212, 175, 55, 0.2); transform: scale(1.1); }
 
-/* ** THE FIX: Media Query for mobile screen overlap ** */
 @media (max-width: 600px) {
-    #network-controls {
-        bottom: auto;
-        top: 2rem;
-    }
+    #network-controls { bottom: auto; top: 2rem; }
 }
-
 
 /* Modal Styles */
 #modal-backdrop, #info-modal-backdrop, #guide-modal-backdrop {
@@ -185,8 +180,26 @@ body {
 .mandala-group:hover .mandala-circle { transform: scale(1.05); }
 .verse-dot { fill: var(--dark-blue); cursor: pointer; }
 
+/* Loading Screen Styles */
 #loading, #error { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--dark-blue); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 300; padding: 2rem; text-align: center; }
-#loading-spinner { font-size: 4rem; animation: spin 2s linear infinite; }
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-#loading-text { margin-top: 1rem; font-size: 1.25rem; color: var(--gold); }
+
+/* ** THE FIX: New styles for the loading media ** */
+#loading-media-container {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+    animation: pulse 2.5s infinite ease-in-out;
+}
+.loading-media-content {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+@keyframes pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(212, 175, 55, 0.5); }
+    50% { transform: scale(1.05); box-shadow: 0 0 45px rgba(212, 175, 55, 0.7); }
+}
+#loading-text { margin-top: 1.5rem; font-size: 1.25rem; color: var(--gold); }
 #error-message { font-size: 1.5rem; color: var(--gold); max-width: 800px; }

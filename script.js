@@ -34,6 +34,24 @@ async function init() {
         if (!configResponse.ok) throw new Error('config.json not found or could not be loaded.');
         config = await configResponse.json();
 
+        // ** THE FIX: Populate the loading screen media right after getting config **
+        const loadingMediaContainer = document.getElementById('loading-media-container');
+        if (loadingMediaContainer) {
+            let mediaElement;
+            if (config.mediaType === 'video') {
+                mediaElement = document.createElement('video');
+                mediaElement.autoplay = true;
+                mediaElement.loop = true;
+                mediaElement.muted = true;
+                mediaElement.playsInline = true;
+            } else {
+                mediaElement = document.createElement('img');
+            }
+            mediaElement.src = config.mediaURL;
+            mediaElement.className = 'loading-media-content';
+            loadingMediaContainer.appendChild(mediaElement);
+        }
+
         if (typeof d3 === 'undefined') throw new Error('D3.js failed to load.');
         const response = await fetch('./rigveda_data_augmented.json');
         if (!response.ok) throw new Error(`Failed to load data: ${response.status}`);
@@ -53,7 +71,6 @@ async function init() {
         initializeVisualization();
         setupEventListeners();
 
-        // ** NEW: Check if the guide has been shown before **
         if (!localStorage.getItem('vedaOneGuideCompleted')) {
             openGuideModal();
         }
@@ -255,7 +272,7 @@ function showToast(message) {
 }
 
 // ===================================================================
-// NEW: GUIDE MODAL LOGIC
+// GUIDE MODAL LOGIC
 // ===================================================================
 let currentGuideStep = 0;
 const guideSteps = document.querySelectorAll('.guide-step');
@@ -286,7 +303,6 @@ function closeGuideModal() {
     localStorage.setItem('vedaOneGuideCompleted', 'true');
 }
 
-
 // ===================================================================
 // EVENT LISTENERS
 // ===================================================================
@@ -308,7 +324,6 @@ function setupEventListeners() {
     infoModal.querySelector('.modal-close-btn').addEventListener('click', () => { playSound('close'); infoModal.style.display = 'none'; });
     infoModal.addEventListener('click', (e) => { if (e.target.id === 'info-modal-backdrop') { playSound('close'); infoModal.style.display = 'none'; } });
 
-    // NEW: Guide event listeners
     document.getElementById('guide-btn').addEventListener('click', openGuideModal);
     document.getElementById('guide-next-btn').addEventListener('click', () => { playSound('click'); showGuideStep(++currentGuideStep); });
     document.getElementById('guide-back-btn').addEventListener('click', () => { playSound('click'); showGuideStep(--currentGuideStep); });
