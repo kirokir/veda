@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Offline Image Converter & Resizer — WebP + PNG sizes</title>
+<style>
+  :root{
+    --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#ffcc00;
+    --glass: rgba(255,255,255,0.04);
+    color-scheme: dark;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
+  body{background:linear-gradient(180deg,#071024 0%, #061827 100%); display:flex; align-items:flex-start; justify-content:center; padding:28px; color:#e6eef6;}
+  .wrap{width:100%; max-width:1100px}
+  header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+  h1{margin:0;font-size:20px}
+  .controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:12px; padding:14px; box-shadow:0 6px 18px rgba(2,6,23,0.6); border:1px solid rgba(255,255,255,0.03)}
+  .uploader{border:2px dashed rgba(255,255,255,0.04); padding:18px; border-radius:10px; text-align:center; cursor:pointer; user-select:none}
+  .uploader.drag{background:linear-gradient(90deg, rgba(255,204,0,0.06), rgba(255,255,255,0.01)); border-color: rgba(255,204,0,0.22)}
+  input[type="file"]{display:none}
+  button{background:var(--accent); color:#061227; padding:8px 12px; border-radius:8px; border:0; font-weight:600; cursor:pointer}
+  button.ghost{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,0.03)}
+  .row{display:flex; gap:12px; align-items:center}
+  .files-grid{margin-top:14px; display:grid; grid-template-columns: 1fr; gap:12px}
+  .file-item{display:flex; gap:12px;align-items:center;padding:10px;border-radius:10px;background:var(--glass); border:1px solid rgba(255,255,255,0.02)}
+  .thumb{width:72px;height:72px; border-radius:8px; overflow:hidden; flex:0 0 72px; display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#ffffff0a,#00000008)}
+  .thumb img{max-width:100%; max-height:100%}
+  .meta{flex:1; min-width:0}
+  .meta .name{font-weight:700; font-size:13px; color:#f7fbff; white-space:nowrap; text-overflow:ellipsis; overflow:hidden}
+  .meta .sub{font-size:12px;color:var(--muted); margin-top:6px}
+  .actions{display:flex;gap:8px;align-items:center}
+  table.outputs{width:100%; border-collapse:collapse;margin-top:12px}
+  table.outputs th, table.outputs td{padding:8px; text-align:left; border-bottom:1px dashed rgba(255,255,255,0.03); font-size:13px}
+  input[type="text"]{width:100%; padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.04); background:transparent;color:inherit}
+  .small{font-size:12px;color:var(--muted)}
+  .toolbar{display:flex;gap:8px; align-items:center; margin-top:10px}
+  .check{width:18px;height:18px}
+  .progress{height:8px;background:#062; border-radius:6px; overflow:hidden}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg, var(--accent), #ffd37a); width:0%}
+  .footer-note{font-size:12px;color:var(--muted); margin-top:12px}
+  @media(min-width:880px){ .files-grid{grid-template-columns: 1fr 1fr} }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Offline Image Converter & Resizer</h1>
+        <div class="small">Convert JPG/PNG → WebP, compress, and output PNGs (512,192,32,16). Rename & batch-download — all offline.</div>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="controls">
+        <label class="uploader" id="dropzone">
+          <div style="font-weight:700">Drag & drop images here or click to add</div>
+          <div class="small">Supports JPG, JPEG, PNG. Multiple files allowed.</div>
+          <input id="fileInput" type="file" accept="image/*" multiple />
+        </label>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="row">
+            <label class="small">WebP quality</label>
+            <input id="quality" type="range" min="0.1" max="1" step="0.05" value="0.8" />
+            <span id="qval" class="small">0.80</span>
+          </div>
+          <div class="row">
+            <button id="processBtn">Process selected files</button>
+            <button id="clearBtn" class="ghost">Clear all</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar" style="margin-top:12px;">
+        <label><input type="checkbox" id="selectAll" /> Select all</label>
+        <button id="downloadSelected" class="ghost">Download selected</button>
+        <button id="downloadAll">Download all</button>
+        <div style="margin-left:auto" class="small">Processed files will appear below. Rename before downloading.</div>
+      </div>
+
+      <div id="filesArea" class="files-grid"></div>
+
+      <div class="footer-note">Note: conversion & resizing is done using the browser's canvas API. WebP support depends on your browser (most modern browsers support it).</div>
+    </div>
+  </div>
+
+<script>
+/* Offline Image Converter & Resizer
+   Features:
+   - Upload multiple images (drag/drop or file input)
+   - Convert to WebP with adjustable quality
+   - Produce 512x512, 192x192, 32x32, 16x16 PNGs (resizes preserving aspect ratio and letterbox when needed)
+   - Rename outputs inline
+   - Select individual outputs or all, download selected or all
+   - Entirely client-side (no server)
+*/
+
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const filesArea = document.getElementById('filesArea');
+const processBtn = document.getElementById('processBtn');
+const clearBtn = document.getElementById('clearBtn');
+const qualityInput = document.getElementById('quality');
+const qval = document.getElementById('qval');
+const selectAll = document.getElementById('selectAll');
+const downloadSelected = document.getElementById('downloadSelected');
+const downloadAll = document.getElementById('downloadAll');
+
+let items = []; // {id, file, url, processedOutputs: [{id,name,blob,type,checked}] }
+
+function uid(){ return Math.random().toString(36).slice(2,10) }
+
+function bytesToSize(bytes){
+  if(bytes===0) return '0 B';
+  const k=1024; const sizes=['B','KB','MB','GB'];
+  const i=Math.floor(Math.log(bytes)/Math.log(k));
+  return parseFloat((bytes/Math.pow(k,i)).toFixed(2))+' '+sizes[i];
+}
+
+qualityInput.addEventListener('input', ()=> qval.textContent = Number(qualityInput.value).toFixed(2));
+
+dropzone.addEventListener('click', ()=> fileInput.click());
+fileInput.addEventListener('change', (e)=> handleFiles(e.target.files));
+
+;['dragenter','dragover'].forEach(ev=>{
+  dropzone.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); dropzone.classList.add('drag'); });
+});
+;['dragleave','drop'].forEach(ev=>{
+  dropzone.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('drag'); });
+});
+dropzone.addEventListener('drop', (e)=>{
+  const dt = e.dataTransfer;
+  if(!dt) return;
+  handleFiles(dt.files);
+});
+
+function handleFiles(fileList){
+  const arr = Array.from(fileList).filter(f => f.type.startsWith('image/'));
+  for(const f of arr){
+    const id = uid();
+    const url = URL.createObjectURL(f);
+    items.push({id, file:f, url, processedOutputs: [], selected:true});
+  }
+  renderFiles();
+}
+
+function renderFiles(){
+  filesArea.innerHTML = '';
+  items.forEach((it, idx) => {
+    const div = document.createElement('div');
+    div.className = 'file-item card';
+    div.dataset.id = it.id;
+    div.innerHTML = `
+      <div class="thumb"><img src="${it.url}" alt=""></div>
+      <div class="meta">
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" class="file-checkbox" data-id="${it.id}" checked />
+          <div style="min-width:0">
+            <div class="name">${escapeHtml(it.file.name)}</div>
+            <div class="sub">${it.file.type} • ${bytesToSize(it.file.size)}</div>
+          </div>
+        </div>
+        <div class="small" style="margin-top:8px">
+          Outputs:
+        </div>
+        <div class="outputs-wrapper" id="outputs-${it.id}"></div>
+      </div>
+      <div class="actions">
+        <button data-action="process" data-id="${it.id}">Process</button>
+        <button data-action="remove" data-id="${it.id}" class="ghost">Remove</button>
+      </div>
+    `;
+    filesArea.appendChild(div);
+
+    // output table placeholder
+    updateOutputsTable(it.id);
+  });
+
+  // attach listeners
+  filesArea.querySelectorAll('button[data-action]').forEach(btn=>{
+    btn.onclick = (e)=>{
+      const act = btn.dataset.action;
+      const id = btn.dataset.id;
+      if(act==='process') processSingle(id);
+      if(act==='remove') removeItem(id);
+    }
+  });
+
+  filesArea.querySelectorAll('.file-checkbox').forEach(cb=>{
+    cb.addEventListener('change', (e)=>{
+      const id = cb.dataset.id;
+      const it = items.find(x=>x.id===id);
+      if(it) it.selected = cb.checked;
+    });
+  });
+  selectAll.checked = items.length>0 && items.every(i=>i.selected!==false);
+}
+
+function updateOutputsTable(itemId){
+  const wrapper = document.getElementById('outputs-'+itemId);
+  const it = items.find(x=>x.id===itemId);
+  if(!it) return;
+  if(it.processedOutputs.length===0){
+    wrapper.innerHTML = `<div class="small" style="margin-top:6px;color:var(--muted)">No outputs yet. Click Process.</div>`;
+    return;
+  }
+
+  // build table
+  let html = `<table class="outputs"><thead><tr>
+    <th style="width:24px"><input type="checkbox" class="outputs-header" data-id="${itemId}" /></th>
+    <th>Filename</th><th>Type</th><th>Size</th><th>Action</th>
+  </tr></thead><tbody>`;
+  it.processedOutputs.forEach((o, idx)=>{
+    html += `<tr data-oid="${o.id}">
+      <td><input type="checkbox" class="out-check" data-item="${itemId}" data-oid="${o.id}" ${o.checked ? 'checked' : ''}></td>
+      <td><input class="out-name" data-item="${itemId}" data-oid="${o.id}" value="${escapeHtml(o.name)}" /></td>
+      <td class="small">${o.type}</td>
+      <td class="small">${bytesToSize(o.blob.size)}</td>
+      <td><button data-action="dl" data-item="${itemId}" data-oid="${o.id}">Download</button></td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+  wrapper.innerHTML = html;
+
+  // listeners for checkboxes & names & download buttons
+  wrapper.querySelectorAll('.out-check').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const item = cb.dataset.item, oid = cb.dataset.oid;
+      const out = findOutput(item, oid);
+      if(out) out.checked = cb.checked;
+      updateMasterSelect();
+    });
+  });
+  wrapper.querySelectorAll('.outputs-header').forEach(h=>{
+    h.addEventListener('change', ()=>{
+      const checks = wrapper.querySelectorAll('.out-check');
+      checks.forEach(c=> { c.checked = h.checked; const out = findOutput(itemId, c.dataset.oid); if(out) out.checked = c.checked; });
+      updateMasterSelect();
+    });
+  });
+  wrapper.querySelectorAll('.out-name').forEach(inp=>{
+    inp.addEventListener('change', ()=> {
+      const item = inp.dataset.item, oid = inp.dataset.oid;
+      const out = findOutput(item, oid);
+      if(out) out.name = inp.value.trim() || out.name;
+    });
+  });
+  wrapper.querySelectorAll('button[data-action="dl"]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const item = b.dataset.item, oid = b.dataset.oid;
+      const out = findOutput(item, oid);
+      if(out) triggerDownload(out.blob, out.name);
+    });
+  });
+}
+
+function findOutput(itemId, oid){
+  const it = items.find(x=>x.id===itemId);
+  if(!it) return null;
+  return it.processedOutputs.find(o=>o.id===oid);
+}
+
+function updateMasterSelect(){
+  selectAll.checked = items.length>0 && items.every(i => i.processedOutputs.length>0 && i.processedOutputs.every(o=>o.checked));
+}
+
+// Remove file
+function removeItem(id){
+  const idx = items.findIndex(x=>x.id===id);
+  if(idx>=0){
+    URL.revokeObjectURL(items[idx].url);
+    items.splice(idx,1);
+    renderFiles();
+  }
+}
+
+// Process everything selected
+processBtn.addEventListener('click', ()=> {
+  const selectedItems = items.filter(i => i.selected !== false);
+  if(selectedItems.length===0){ alert('No files selected.'); return; }
+  Promise.all(selectedItems.map(i => processFile(i))).then(()=> {
+    renderFiles();
+    alert('Processing finished for selected files.');
+  }).catch(err => { console.error(err); alert('Error while processing: '+err.message) });
+});
+
+// Process single file
+function processSingle(id){
+  const it = items.find(x=>x.id===id);
+  if(!it) return;
+  processFile(it).then(()=> {
+    updateOutputsTable(id);
+  });
+}
+
+async function processFile(it){
+  // If already processed, skip clearing outputs? We'll append new outputs and keep old ones.
+  const file = it.file;
+  const baseName = file.name.replace(/\.[^/.]+$/, "");
+  // read image
+  const img = await loadImage(it.url);
+  // Conversion to WebP (if possible)
+  const quality = Number(qualityInput.value) || 0.8;
+  // create webp blob
+  let webpBlob = await canvasToBlob(img, img.naturalWidth, img.naturalHeight, 'image/webp', quality);
+  if(!webpBlob){ // fallback: convert to png if webp not supported
+    webpBlob = await canvasToBlob(img, img.naturalWidth, img.naturalHeight, 'image/png', 0.92);
+  }
+  const webpName = `${baseName}.webp`;
+  const webpOut = { id: uid(), name: webpName, blob: webpBlob, type: 'WEBP', checked: true };
+  it.processedOutputs.push(webpOut);
+
+  // Create PNGs at sizes: 512,192,32,16 (square) - we'll fit image preserving aspect ratio and center; if image not square, draw onto square canvas with transparent background
+  const targetSizes = [512,192,32,16];
+  for(const s of targetSizes){
+    const resizedBlob = await resizeToSquarePNG(img, s);
+    const outName = `${baseName}_${s}x${s}.png`;
+    it.processedOutputs.push({ id: uid(), name: outName, blob: resizedBlob, type: `${s}×${s} PNG`, checked: true });
+  }
+  // update UI
+  updateOutputsTable(it.id);
+}
+
+// Utility: loadImage from objectURL
+function loadImage(src){
+  return new Promise((res, rej)=>{
+    const img = new Image();
+    img.onload = ()=> res(img);
+    img.onerror = (e)=> rej(new Error('Failed to load image'));
+    img.src = src;
+    // in some browsers, to allow cross-origin canvas export, set crossOrigin - but since files are object URLs, ok
+  });
+}
+
+// Draw image on canvas then export blob
+function canvasToBlob(img, w, h, mime='image/png', quality=0.92){
+  return new Promise((res)=>{
+    try{
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const ctx = c.getContext('2d');
+      // clear (transparent)
+      ctx.clearRect(0,0,c.width,c.height);
+      ctx.drawImage(img, 0, 0, w, h);
+      if(canvasSupportsMime(c, mime)){
+        c.toBlob((blob)=> res(blob), mime, quality);
+      } else {
+        // try PNG fallback
+        c.toBlob((blob)=> res(blob), 'image/png', 0.92);
+      }
+    } catch(err){
+      console.error('canvasToBlob error', err);
+      res(null);
+    }
+  });
+}
+
+function canvasSupportsMime(canvas, mime){
+  try{
+    // create tiny blob test — but expensive; simpler: trust toBlob with mime may return null; we'll handle null upstream
+    return true;
+  } catch(e){ return false; }
+}
+
+// Resize to square canvas with transparent background, fit image with max-fit preserving aspect ratio and centered
+function resizeToSquarePNG(img, size){
+  return new Promise((res)=>{
+    const c = document.createElement('canvas');
+    c.width = size; c.height = size;
+    const ctx = c.getContext('2d');
+    ctx.clearRect(0,0,size,size);
+    // compute fit
+    const iw = img.naturalWidth, ih = img.naturalHeight;
+    const ratio = Math.min(size/iw, size/ih);
+    const dw = Math.round(iw * ratio);
+    const dh = Math.round(ih * ratio);
+    const dx = Math.round((size - dw)/2);
+    const dy = Math.round((size - dh)/2);
+    ctx.drawImage(img, 0,0, iw,ih, dx, dy, dw, dh);
+    c.toBlob(blob=> res(blob), 'image/png', 0.92);
+  });
+}
+
+// Trigger browser download
+function triggerDownload(blob, filename){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=> { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+}
+
+// Download selected outputs across items
+downloadSelected.addEventListener('click', ()=>{
+  const outputs = [];
+  items.forEach(it=>{
+    it.processedOutputs.forEach(o=> { if(o.checked) outputs.push(o); });
+  });
+  if(outputs.length===0){ alert('No outputs selected for download.'); return; }
+  // Trigger downloads serially to avoid browser blocking
+  serialDownload(outputs);
+});
+
+// Download all outputs (all processed)
+downloadAll.addEventListener('click', ()=>{
+  const outputs = [];
+  items.forEach(it=>{
+    it.processedOutputs.forEach(o=> outputs.push(o));
+  });
+  if(outputs.length===0){ alert('No outputs available. Process files first.'); return; }
+  serialDownload(outputs);
+});
+
+function serialDownload(outputs){
+  let idx = 0;
+  function next(){
+    if(idx>=outputs.length) return;
+    const o = outputs[idx++];
+    triggerDownload(o.blob, o.name);
+    // slight delay for browsers that block many downloads
+    setTimeout(next, 220);
+  }
+  next();
+}
+
+clearBtn.addEventListener('click', ()=>{
+  if(!confirm('Clear all files and outputs?')) return;
+  items.forEach(it=> URL.revokeObjectURL(it.url));
+  items = [];
+  renderFiles();
+});
+
+// helper
+function escapeHtml(s){ return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
+
+// allow header select all
+selectAll.addEventListener('change', ()=>{
+  const val = selectAll.checked;
+  items.forEach(it=> {
+    it.selected = val;
+    // also mark all outputs checked if processed
+    it.processedOutputs.forEach(o=> o.checked = val);
+  });
+  renderFiles();
+});
+
+// simple utils: preserve outputs checkbox state on re-render
+// initial render
+renderFiles();
+
+</script>
+</body>
+</html>
